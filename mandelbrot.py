@@ -1,7 +1,30 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import lhsmdu
+from skopt.sampler import Lhs
+from skopt.space import Space
 from numpy import newaxis
 
+def random_sample(x, y, n_samples):
+    # Makes a x and y array of random values
+    for i in range(n_samples):
+        a = np.random.uniform(-2,1)
+        x = np.append(x,a)
+        b = np.random.uniform(-1.5,1.5)
+        y = np.append(y,b)
+    return x, y
+
+def lhs_sample(x, y, n_samples):
+    space = Space([(-2.,1.), (-1.5, 1.5)])  
+    lhs = Lhs(lhs_type="classic", criterion=None)
+    coordinates = lhs.generate(space.dimensions, n_samples)
+
+    for coordinate in coordinates:
+        a = coordinate[0]
+        x = np.append(x,a)
+        b = coordinate[1]
+        y = np.append(y,b)
+    return x, y
 def mandelbrot_computation(N_max, some_threshold, x, y):
     """
     Computes the mandelbrot set. 
@@ -43,24 +66,26 @@ def compute_image_mandelbrot(N_max, some_threshold, nx, ny):
     plt.show()
 
 
-def compute_area_mandelbrot(N_max, some_threshold, nx, ny):
+def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind):
     """
     Computes the Area of the mandel brot set with the monte carlo method.
     Takes as initial values N_max(integer), some_threshold(Number), nx(integer), ny(integer)
     returns the amount of hits and the ratio of hits/total shots
     """
+
     # Initializes values
     hits = 0
     x = np.array([])
     y = np.array([])
+    n_samples
 
-    # Makes a x and y array of random values
-    for i in range(nx):
-        a = np.random.uniform(-2,1)
-        x = np.append(x,a)
-    for i in range(ny):
-        b = np.random.uniform(-1.5,1.5)
-        y = np.append(y,b)
+    if kind == "random":
+        sample = random_sample(x, y, n_samples)
+    elif kind == "lhs":
+        sample = lhs_sample(x, y, n_samples)
+    
+    x = sample[0]
+    y = sample[1]
 
     # Uses the random values for the mandelbrot computation
     mandelbrot_set = mandelbrot_computation(N_max, some_threshold, x, y)
@@ -72,15 +97,17 @@ def compute_area_mandelbrot(N_max, some_threshold, nx, ny):
                 hits+=1
     
     # calculates the ratio hits/total shots
-    ratio = hits/(nx*ny)
+    ratio = hits/n_samples**2
 
     return hits, ratio
 
+
 if __name__=="__main__":
     
-    monte_carlo = compute_area_mandelbrot(50, 5., 100, 10)
-    hits = monte_carlo[0]
-    ratio = monte_carlo[1]
+    print(compute_area_mandelbrot(100, 5, 100, "random"))
+    print(compute_area_mandelbrot(100, 5, 100, "lhs"))
 
-    print(hits, ratio)
-    compute_image_mandelbrot(50, 5., 100, 10)
+
+
+
+   
