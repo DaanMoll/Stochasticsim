@@ -1,9 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import lhsmdu
+import pynolh
+import random
 from skopt.sampler import Lhs
 from skopt.space import Space
 from numpy import newaxis
+from scipy.stats import ortho_group
+import pandas as pd
+import seaborn as sns
 
 def random_sample(x, y, n_samples):
     """
@@ -114,54 +119,69 @@ def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind):
             if value == True:
                 hits+=1
     
-    # calculates the ratio hits/total shots
+    # Calculates the ratio hits/total shots
     ratio = hits/n_samples**2
 
-    # total plot area is 9 so ratio * 9
+    # Calculates the area
     area = ratio * 9
 
     return hits, ratio, area
 
 
 if __name__=="__main__":
-    # compute_image_mandelbrot(100, 5, 401, 601)
 
-    N_max = [10, 100, 200, 300, 500]
-    n_samples = [50, 100, 200]
-
-    fig, (ax1, ax2) = plt.subplots(1, 2)
-
-    for n in n_samples:
-        r_areas = []
-        lhs_areas = []
-
-        print(n)
-
-        for N in N_max:
-            r_mean = []
-            lhs_mean = []
-            for _ in range(10):
-                random = compute_area_mandelbrot(N, 5, n, "random")
-                lhs = compute_area_mandelbrot(N, 5, n, "lhs")
-                
-                r_mean.append(random[2])
-                lhs_mean.append(lhs[2])
-            
-            r_areas.append(np.mean(r_mean))
-            lhs_areas.append(np.mean(lhs_mean))
-
-        ax1.plot(N_max, r_areas, label=f"{n} samples rand")
-        ax2.plot(N_max, lhs_areas, label=f"{n} samples, lhs")
+    pandas_y_values = []
+    pandas_x_values = []
+    pandas_sim = []
+    random = []
+    random_means = []
+    lhs= []
+    lhs_means = []
+    x = []
     
-    ax1.legend()
-    ax2.legend()
+    for a in range(1,20):
+        x.append(a*20)
+        for i in range(10):
+            random_c = compute_area_mandelbrot(100, 5, a*20, "random")
+            lhs_c = compute_area_mandelbrot(100, 5, a*20, "lhs")
+            # print("Random: ",random_c)
+            # print("LHS: ",lhs)
+            lhs.append(lhs_c[2])
+            random.append(random_c[2])
+            pandas_x_values.append(a*20)
+            pandas_y_values.append(lhs_c[2])
+            pandas_sim.append("lhs")
+            pandas_y_values.append(random_c[2])
+            pandas_x_values.append(a*20)
+            pandas_sim.append("random")
+        
+        lhs_means.append(np.mean(lhs))
+        random_means.append(np.mean(random))
+        # print("Random mean = ",np.mean(random))
+        # print("Random std = ", np.std(random))
+        # print("LHS mean = ",np.mean(lhs))
+        # print("LHS std = ",np.std(lhs))
+
+    # plt.plot(x, lhs_means, label = "lhs", alpha= 0.75)
+    # plt.plot(x, random_means, label = "Random", alpha = 0.75)
+    # plt.rcParams["figure.figsize"] = [20,9]
+
+    print(len(pandas_sim), len(pandas_x_values), len(pandas_y_values))
+    data = {'Sim':pandas_sim, 'samples':pandas_x_values, 'area':pandas_y_values} 
+    sns.set()
+    # Create DataFrame 
+    df = pd.DataFrame(data) 
+    
+    # Print the output. 
+    print(df) 
+    sns.lineplot(data=data, x="samples", y="area", hue="Sim")
     plt.show()
-
-
-
-
-
-
-
-
-   
+    fig = plt.figure(figsize=(15,10))
+    ax = fig.add_subplot(111)
+    ax.plot(x, lhs_means, label = "lhs", alpha= 0.5)
+    ax.plot(x, random_means, label = "Random", alpha = 0.5)
+    ax.legend()
+    fig.show()
+    fig.savefig('fig1.png', dpi = 300)
+    # fig.close()
+    
