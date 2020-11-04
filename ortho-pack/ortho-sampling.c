@@ -6,7 +6,7 @@
 #include "mt19937.h"
 #include "rand_support.h"
 
-#define MAJOR	   9
+#define MAJOR	   27
 #define SAMPLES    (MAJOR * MAJOR)
 
 /* We will have a total of SAMPLES samples, one in each of the MAJOR * MAJOR cells.
