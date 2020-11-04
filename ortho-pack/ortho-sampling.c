@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
+
 #include "mt19937.h"
 #include "rand_support.h"
 
-#define MAJOR	   9999
+#define MAJOR	   9
 #define SAMPLES    (MAJOR * MAJOR)
 
 /* We will have a total of SAMPLES samples, one in each of the MAJOR * MAJOR cells.
@@ -25,8 +26,7 @@ long xlist[MAJOR][MAJOR] = {{0}};
 long ylist[MAJOR][MAJOR] = {{0}};
 
 int
-main()
-{
+main() {
     int i;
     int j;
     int k;
@@ -34,6 +34,7 @@ main()
     long double scale = 4.0 / ((long double) SAMPLES);
     double x;
     double y;
+    int RUNS = 10;
 
     init_genrand(3737);
     m = 0;
@@ -51,6 +52,7 @@ main()
             xlist[i][j] = ylist[i][j] = m++;
         }
     }
+
     for (k = 0; k < RUNS; k++)
     {
         for (i = 0; i < MAJOR; i++)
@@ -76,11 +78,42 @@ main()
                 /* For a given subsquare row, every subsquare has its sample in a different 
                    row of cells */
                 y = -2.0 + scale * (ylist[j][i] + (long double) genrand_real2());
-
                 /* Do the desired computation with with x and y at this point in the code */
             }
         }
     }
+
+    char filenumber[8];
+    
+    // FILE *ptr = fopen("data.txt","w");
+    sprintf(filenumber, "%i.txt", SAMPLES);
+    FILE *ptr = fopen(filenumber, "w");
+
+    for (i = 0; i < MAJOR; i++)
+    {
+        for (j = 0; j < MAJOR; j++)
+        {   
+            float xc = xlist[i][j];
+            xc = xc / ((MAJOR * MAJOR) / 3);
+            xc = xc - 2;
+            fprintf(ptr, "%f,", xc);
+        }
+    }
+
+    fprintf(ptr, "\n");
+
+    for (i = 0; i < MAJOR; i++)
+    {
+        for (j = 0; j < MAJOR; j++)
+        {   
+            float yc = ylist[i][j];
+            yc = yc / ((MAJOR * MAJOR) / 3);
+            yc = yc - 1.5;
+            fprintf(ptr, "%f,", yc);
+        }
+    }
+    fclose(ptr);
+
     /* Postprocessing */
     return 0;
 }

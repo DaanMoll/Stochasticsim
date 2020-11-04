@@ -57,17 +57,15 @@ get_subrange_rand()
    The random values will be uniformly distributed over
    0..range and may include both 0 and range */
 unsigned long
-getrand_inrange(unsigned long range)
+getrand_inrange(unsigned long range2)
 {
     unsigned long long N = MAX_UNSIGNED_RAND;
     unsigned long long rp1;
-    unsigned long divisor;
-    unsigned long reject_above;
     unsigned long r;
-    if (range)
+    if (range2)
     {
         N++;
-        rp1 = range;
+        rp1 = range2;
         rp1++;
         divisor = N / rp1;
         reject_above = rp1 * divisor - 1;
