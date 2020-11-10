@@ -6,7 +6,7 @@
 #include "mt19937.h"
 #include "rand_support.h"
 
-#define MAJOR	   27
+#define MAJOR	   100
 #define SAMPLES    (MAJOR * MAJOR)
 
 /* We will have a total of SAMPLES samples, one in each of the MAJOR * MAJOR cells.
@@ -34,7 +34,7 @@ main() {
     long double scale = 4.0 / ((long double) SAMPLES);
     double x;
     double y;
-    int RUNS = 10;
+    int RUNS = 2;
 
     init_genrand(3737);
     m = 0;
@@ -42,8 +42,8 @@ main() {
     /* Divide each subsquare into MAJOR * MAJOR cells */
     /* The first index determines the row/column number of the subsquare */
     /* So xlist[2][5] would indicate what minor column contains the sample
-       in the major cell with major column number 2 and major row number 5
-       ylist[2][5] will provide its minor row number */
+    in the major cell with major column number 2 and major row number 5
+    ylist[2][5] will provide its minor row number */
 
     for (i = 0; i < MAJOR; i++)
     {
@@ -59,9 +59,9 @@ main() {
         {
             /* permute will give me a permutation of the list with MAJOR elements */
             /* Due to the way the lists have been created subranges with similar
-               x or y values will stay together
-               xlist[i] is a pointer to the start of the 1D array xlist[i][0] ... xlist[i][MAJOR - 1]
-             */
+            x or y values will stay together
+            xlist[i] is a pointer to the start of the 1D array xlist[i][0] ... xlist[i][MAJOR - 1]
+            */
             permute(xlist[i], MAJOR);
             permute(ylist[i], MAJOR);
         }
@@ -70,13 +70,13 @@ main() {
             for (j = 0; j < MAJOR; j++)  /* Subsquare row */
             {
                 /* For a given subsquare column (i) every subsquare has its sample in
-                   a different column of cells (as determined by xlist[i][j]
-                   The random long double value selects a random point in the minor subsquare
-                 */
+                a different column of cells (as determined by xlist[i][j]
+                The random long double value selects a random point in the minor subsquare
+                */
                 x = -2.0 + scale * (xlist[i][j] + (long double) genrand_real2());
 
                 /* For a given subsquare row, every subsquare has its sample in a different 
-                   row of cells */
+                row of cells */
                 y = -2.0 + scale * (ylist[j][i] + (long double) genrand_real2());
                 /* Do the desired computation with with x and y at this point in the code */
             }
@@ -86,7 +86,7 @@ main() {
     char filenumber[8];
     
     // FILE *ptr = fopen("data.txt","w");
-    sprintf(filenumber, "%i.txt", SAMPLES);
+    sprintf(filenumber, "%d.txt", MAJOR);
     FILE *ptr = fopen(filenumber, "w");
 
     for (i = 0; i < MAJOR; i++)
