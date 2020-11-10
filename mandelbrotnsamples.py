@@ -156,12 +156,3 @@ if __name__=="__main__":
     ax1.legend()
     ax2.legend()
     plt.show()
-
-
-
-
-
-
-
-
-   

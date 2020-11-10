@@ -44,6 +44,30 @@ def lhs_sample(x, y, n_samples):
 
     return x, y
 
+def ortho_sample(x, y, n_samples):
+    """
+    Takes random n_samples with the orthogonal sampling method.
+    Returns array x and y.
+    """
+    counter = 0
+    major = n_samples ** 0.5
+
+    with open(f"ortho-pack/{int(major)}.txt") as coordinates:
+        for row in coordinates:
+            row = row.split(",")
+            row.pop(-1)
+
+            if counter == 0:
+                for coordinate in row:
+                    x = np.append(x,float(coordinate))
+            elif counter == 1:
+                for coordinate in row:
+                    y = np.append(y,float(coordinate))
+
+            counter += 1
+    
+    return x, y
+
 def mandelbrot_computation(N_max, some_threshold, x, y):
     """
     Computes the mandelbrot set. 
@@ -88,7 +112,7 @@ def compute_image_mandelbrot(N_max, some_threshold, nx, ny):
 def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind):
     """
     Computes the Area of the mandel brot set with the monte carlo method.
-    Takes as initial values N_max(integer), some_threshold(Number), n_samples(integer), kind(string = random, lhs)
+    Takes as initial values N_max(integer), some_threshold(Number), n_samples(integer), kind(string = random, lhs, ortho)
     returns the amount of hits and the ratio of hits/total shots
     """
 
@@ -101,6 +125,8 @@ def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind):
         sample = random_sample(x, y, n_samples)
     elif kind == "lhs":
         sample = lhs_sample(x, y, n_samples)
+    elif kind == "ortho":
+        sample = ortho_sample(x, y, n_samples)
     
     x = sample[0]
     y = sample[1]
@@ -124,38 +150,47 @@ def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind):
 
 
 if __name__=="__main__":
-    # compute_image_mandelbrot(100, 5, 401, 601)
+    # zorgen dat n_samples.txt in ortho-pack staat voor ortho sampling
 
-    N_max = [10, 100, 200, 300, 500]
-    n_samples = [50, 100, 200]
+    N_max = range(10, 1000, 10)
+    major = 15
+    n = major * major
 
-    fig, (ax1, ax2) = plt.subplots(1, 2)
+    r_areas = []
+    lhs_areas = []
+    ortho_areas= []
 
-    for n in n_samples:
-        r_areas = []
-        lhs_areas = []
+    for N in N_max:
+        r_mean = []
+        lhs_mean = []
+        ortho_mean = []
 
-        print(n)
-
-        for N in N_max:
-            r_mean = []
-            lhs_mean = []
-            for _ in range(10):
-                random = compute_area_mandelbrot(N, 5, n, "random")
-                lhs = compute_area_mandelbrot(N, 5, n, "lhs")
-                
-                r_mean.append(random[2])
-                lhs_mean.append(lhs[2])
+        for _ in range(1):
+            random = compute_area_mandelbrot(N, 5, n, "random")
+            lhs = compute_area_mandelbrot(N, 5, n, "lhs")
+            ortho = compute_area_mandelbrot(N, 5, n, "ortho")
             
-            r_areas.append(np.mean(r_mean))
-            lhs_areas.append(np.mean(lhs_mean))
+            r_mean.append(random[2])
+            lhs_mean.append(lhs[2])
+            ortho_mean.append(ortho[2])
+        
+        r_areas.append(np.mean(r_mean))
+        lhs_areas.append(np.mean(lhs_mean))
+        ortho_areas.append(np.mean(ortho_mean))
 
-        ax1.plot(N_max, r_areas, label=f"{n} samples rand")
-        ax2.plot(N_max, lhs_areas, label=f"{n} samples, lhs")
+    r_diff = [abs(area-r_areas[-1]) for area in r_areas]
+    lhs_diff = [abs(area-lhs_areas[-1]) for area in lhs_areas]
+    ortho_diff = [abs(area-ortho_areas[-1]) for area in ortho_areas]
+
+    plt.plot(N_max, r_diff, label=f"Rand")
+    plt.plot(N_max, lhs_diff, label=f"Lhs")
+    plt.plot(N_max, ortho_diff, label=f"Ortho")
     
-    ax1.legend()
-    ax2.legend()
+    plt.legend()
     plt.show()
+
+
+    
 
 
 
