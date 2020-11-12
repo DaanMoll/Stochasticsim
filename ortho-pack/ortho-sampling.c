@@ -6,7 +6,7 @@
 #include "mt19937.h"
 #include "rand_support.h"
 
-#define MAJOR	   100
+#define MAJOR	   10
 #define SAMPLES    (MAJOR * MAJOR)
 
 /* We will have a total of SAMPLES samples, one in each of the MAJOR * MAJOR cells.
@@ -34,7 +34,7 @@ main() {
     long double scale = 4.0 / ((long double) SAMPLES);
     double x;
     double y;
-    int RUNS = 2;
+    int RUNS = 10;
 
     init_genrand(3737);
     m = 0;

@@ -51,8 +51,9 @@ def ortho_sample(x, y, n_samples):
     """
     counter = 0
     major = n_samples ** 0.5
+    integer = np.random.randint(0, 10)
 
-    with open(f"ortho-pack/{int(major)}.txt") as coordinates:
+    with open(f"ortho-pack/{int(major)}_{integer}.txt") as coordinates:
         for row in coordinates:
             row = row.split(",")
             row.pop(-1)
@@ -152,8 +153,10 @@ def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind):
 if __name__=="__main__":
     # zorgen dat n_samples.txt in ortho-pack staat voor ortho sampling
 
-    N_max = range(10, 1000, 10)
-    major = 15
+    # N_max = [value for value in range(10, 101, 10)]
+    # N_max.extend([1200, 1400, 1600, 1800, 2000])
+    N_max = [10, 20, 50, 100, 200, 500, 600, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000]
+    major = 10
     n = major * major
 
     r_areas = []
@@ -165,7 +168,7 @@ if __name__=="__main__":
         lhs_mean = []
         ortho_mean = []
 
-        for _ in range(1):
+        for _ in range(10):
             random = compute_area_mandelbrot(N, 5, n, "random")
             lhs = compute_area_mandelbrot(N, 5, n, "lhs")
             ortho = compute_area_mandelbrot(N, 5, n, "ortho")
@@ -177,14 +180,17 @@ if __name__=="__main__":
         r_areas.append(np.mean(r_mean))
         lhs_areas.append(np.mean(lhs_mean))
         ortho_areas.append(np.mean(ortho_mean))
+        print("mean N:", N, np.mean(r_mean),np.mean(lhs_mean), np.mean(ortho_mean))
 
-    r_diff = [abs(area-r_areas[-1]) for area in r_areas]
+    r_diff = [abs(area-ortho_areas[-1]) for area in r_areas]
     lhs_diff = [abs(area-lhs_areas[-1]) for area in lhs_areas]
     ortho_diff = [abs(area-ortho_areas[-1]) for area in ortho_areas]
 
     plt.plot(N_max, r_diff, label=f"Rand")
     plt.plot(N_max, lhs_diff, label=f"Lhs")
     plt.plot(N_max, ortho_diff, label=f"Ortho")
+
+    print(r_areas[-1], lhs_areas[-1], ortho_areas[-1])
     
     plt.legend()
     plt.show()
