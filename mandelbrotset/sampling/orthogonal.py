@@ -2,7 +2,7 @@ import numpy as np
 import random
 
 
-def another_Orthogonal(ns):
+def ortho(ns):
     assert(np.sqrt(ns) % 1 == 0),"Please insert an even number of samples"
     n = int(np.sqrt(ns))
     # Making a datastructure of a dict with coordinate tuples of a bigger grid with subcoordinate of sub-grid points
@@ -26,13 +26,10 @@ def another_Orthogonal(ns):
 
     return points
 
-
-
-
 def scale_points(points):
     x_l = []
     y_l = []
-    p = another_Orthogonal(points)
+    p = ortho(points)
     maximum = points 
     scaling =[ 1/maximum * i for i in range(len(p))]
     min_ = 0
@@ -41,13 +38,15 @@ def scale_points(points):
     anti_res = np.zeros((points,2)) # this is for antithetic variables
 
     for idx, scale in enumerate(scaling):
-
         x =  min_ + np.random.uniform(p[idx][0]/maximum, p[idx][0]/maximum +1/maximum ) *3  # 4 is just max - min which is in my case 4
         y =  min_ + np.random.uniform(p[idx][1]/maximum, p[idx][1]/maximum + 1/maximum ) *3
         result[idx, :] = [x,y]
         anti_res[idx,:] = [x*-1.0, y*-1.0] # antithetic variables
 
     for i in result:
-        x_l.append(i[0]- 2)
+        x_l.append(i[0]-2)
         y_l.append(i[1]-1.5)
+    
+    x_l = np.array(x_l)
+    y_l = np.array(y_l)
     return x_l, y_l
