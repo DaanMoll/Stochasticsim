@@ -49,6 +49,7 @@ def ortho_sample(x, y, n_samples):
     Takes random n_samples with the orthogonal sampling method.
     Returns array x and y.
     """
+    print("hallo")
     counter = 0
     major = n_samples ** 0.5
     integer = np.random.randint(0, 10)
@@ -66,7 +67,7 @@ def ortho_sample(x, y, n_samples):
                     y = np.append(y,float(coordinate))
 
             counter += 1
-    
+    print(x,y)
     return x, y
 
 def mandelbrot_computation(N_max, some_threshold, x, y):
