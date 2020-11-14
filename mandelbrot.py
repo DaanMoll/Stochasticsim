@@ -12,36 +12,67 @@ from mandelbrotset.mandelbrot_image import compute_image_mandelbrot
 
 if __name__=="__main__":
     N_max = [value for value in range(10, 101, 10)]
-    major = [value for value in range(10, 20, 5)]
-    methods = ["random", "lhs", "ortho"]
+    major = [value for value in range(10, 11, 5)]
+    methods = ["Random", "LHS", "Orthogonal"]
     
     for method in methods:
         p_samples = []
         pandas_y_values = []
         pandas_x_values = []
-
+        pandas_change = []
+        delta_area = []
+        delta_x = []
+        delta_samples = []
+        
         for m in major:
-            n = m * m
+            samples = m * m
+            mean = []
+            
             for N in N_max:
-                for i in range(2):
-                    ortho_c = compute_area_mandelbrot(N, 2, n, method)
-                    p_samples.append(str(n))
-
+                values = []
+                for i in range(10):
+                    ortho_c = compute_area_mandelbrot(N, 2, samples, method)
+                    
+                    p_samples.append(str(samples))
                     pandas_x_values.append(N)
                     pandas_y_values.append(ortho_c[2])
 
-        # # Create an array with the colors you want to use
-        data = {'N_values':pandas_x_values, 'area':pandas_y_values, 'amount':p_samples} 
+                    values.append(ortho_c[2])
 
+                mean.append(np.mean(values))
+                delta_x.append(N)
+                delta_samples.append(str(samples))
+
+            delta_x.pop(-1)
+            delta_samples.pop(-1)
+            for i in range(0, len(mean) - 1):
+                delta_area.append(abs(mean[i] - mean[i+1]))
+
+        # Create an array with the colors you want to use
+        data = {'Iterations':pandas_x_values, 'Area':pandas_y_values, 'Sample size':p_samples} 
+
+        sns.set(rc={'figure.figsize':(20,10)}, font_scale=3)
         plt.figure()
-        sns.set()
 
         # Create DataFrame 
         df = pd.DataFrame(data) 
 
-        svm = sns.lineplot(data=data, x="N_values", y="area", hue="amount").set_title(f"{method}")
+        svm = sns.lineplot(data=data, x="Iterations", y="Area", hue="Sample size").set_title(f"Sampling method: {method}")
         figure = svm.get_figure()
-        figure.savefig(f'Images/{method}.png', dpi=400)
+        figure.savefig(f'images/{method}.png')
+
+        # Delta plot
+        data = {'Iterations':delta_x, 'Delta area':delta_area, 'Sample size':delta_samples} 
+
+        plt.figure()
+        sns.set(rc={'figure.figsize':(20,10)}, font_scale=3)
+
+        # Create DataFrame 
+        df = pd.DataFrame(data) 
+
+        svm = sns.lineplot(data=data, x="Iterations", y="Delta area", hue="Sample size").set_title(f"Sampling method: {method}")
+        figure = svm.get_figure()
+        figure.savefig(f'images/{method}delta.png')
 
     
     # N_max = [value for value in range(10, 101, 10)]
