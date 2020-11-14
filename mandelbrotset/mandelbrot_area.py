@@ -24,11 +24,11 @@ def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind):
     x = np.array([])
     y = np.array([])
 
-    if kind == "random":
+    if kind == "Random":
         sample = random_sample(x, y, n_samples)
-    elif kind == "lhs":
+    elif kind == "LHS":
         sample = lhs_sample(x, y, n_samples)
-    elif kind == "ortho":
+    elif kind == "Orthogonal":
         sample = scale_points(n_samples)
     
     x = sample[0]
