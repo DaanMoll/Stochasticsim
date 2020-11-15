@@ -11,11 +11,12 @@ from mandelbrotset.mandelbrot_area import compute_area_mandelbrot
 from mandelbrotset.mandelbrot_image import compute_image_mandelbrot
 
 if __name__=="__main__":
-    N_max = [value for value in range(10, 101, 10)]
-    major = [value for value in range(10, 11, 5)]
+    N_max = [value for value in range(50, 2001, 50)]
+    major = [value for value in range(10, 26, 5)]
     methods = ["Random", "LHS", "Orthogonal"]
     
     for method in methods:
+        print(method)
         p_samples = []
         pandas_y_values = []
         pandas_x_values = []
@@ -59,7 +60,7 @@ if __name__=="__main__":
 
         svm = sns.lineplot(data=data, x="Iterations", y="Area", hue="Sample size").set_title(f"Sampling method: {method}")
         figure = svm.get_figure()
-        figure.savefig(f'images/{method}.png')
+        figure.savefig(f'images/{method}Nmax{N_max[-1]}.png')
 
         # Delta plot
         data = {'Iterations':delta_x, 'Delta area':delta_area, 'Sample size':delta_samples} 
@@ -72,7 +73,7 @@ if __name__=="__main__":
 
         svm = sns.lineplot(data=data, x="Iterations", y="Delta area", hue="Sample size").set_title(f"Sampling method: {method}")
         figure = svm.get_figure()
-        figure.savefig(f'images/{method}delta.png')
+        figure.savefig(f'images/{method}deltaNmax{N_max[-1]}.png')
 
     
     # N_max = [value for value in range(10, 101, 10)]
