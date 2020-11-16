@@ -7,7 +7,7 @@ from numpy import newaxis
 
 from .sampling.lhs import lhs_sample
 from .sampling.ortho import ortho_sample 
-from .sampling.random_sampling import random_sample
+from .sampling.random_sampling import random_sample, half_random_sample
 from .sampling.orthogonal import scale_points
 
 from .mandelbrotcompute import mandelbrot_computation
@@ -24,6 +24,8 @@ def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind, antithetic):
 
     if kind == "Random":
         sample = random_sample(n_samples)
+    elif kind == "Half Random":
+        sample = half_random_sample(n_samples)
     elif kind == "LHS":
         sample = lhs_sample(n_samples)
     elif kind == "Orthogonal":
@@ -48,8 +50,10 @@ def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind, antithetic):
     area = ratio * 9
 
     if antithetic:
+        
         x_a = sample[2]
         y_a = sample[3]
+        # print("kind", kind, x_a, y_a)
         mandelbrot_set = mandelbrot_computation(N_max, some_threshold, x_a, y_a)
         
         for row in mandelbrot_set:
@@ -57,8 +61,8 @@ def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind, antithetic):
                 if value == True:
                     hits_anti+=1
 
-        ratio_anti = hits/n_samples**2
-        area_anti = ratio * 9
+        ratio_anti = hits_anti/n_samples**2
+        area_anti = ratio_anti * 9
 
         return hits, ratio, area, hits_anti, ratio_anti, area_anti
 

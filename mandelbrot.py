@@ -6,58 +6,89 @@ from skopt.space import Space
 from numpy import newaxis
 import pandas as pd
 import seaborn as sns
+import random
 
 from mandelbrotset.mandelbrot_area import compute_area_mandelbrot
 from mandelbrotset.mandelbrot_image import compute_image_mandelbrot
 
 def sample_size():
     N = 1000
-    major = [value for value in range(10, 34, 1)]
+    major = [value for value in range(10, 42, 3)]
     methods = ["Random", "LHS", "Orthogonal"]
 
-    antithetic = True
-    repetitions = 4
+    antithetic = False
+    repetitions = 40
     repeat = int(repetitions/2) if antithetic else repetitions
-    
+    repeat = repetitions
+
     p_samples = []
     pandas_y_values = []
     pandas_x_values = []
+    
+    count = 0
+    var = []
+    var_anti = []
 
     for method in methods:
         print(method)
+        if count == 1:
+            print("anti is Flase", method)
+            antithetic = False
+
         for m in major:
             samples = m * m
+            print(samples)
+            var1 = []
+            var2 = []
 
             for i in range(repeat):
                 result = compute_area_mandelbrot(N, 2, samples, method, antithetic)
-                p_samples.append(str(method))
-                pandas_x_values.append(str(samples))
-                pandas_y_values.append(result[2])
-
-                if antithetic:
+                
+                if not antithetic:
+                    # antithetic == false
+                    p_samples.append("ortho2")
+                    pandas_x_values.append(str(samples))
+                    pandas_y_values.append(result[2])
+                    var1.append(result[2])
+                elif antithetic:
                     p_samples.append(str(method))
                     pandas_x_values.append(str(samples))
                     pandas_y_values.append(result[5])
-
+                    var2.append(result[5])
+                    
+            if not antithetic:
+                var.append(var1)
+            else:
+                var_anti.append(var2)
+        
+        count += 1
+        # if count == 2:
+        #     break
+    
+    for i in range(len(var)):
+        var3 = np.std(var[i])
+        var4 = np.std(var_anti[i])
+        print(major[i]**2, var3, var4, var3-var4, var3/var4)
+        
     # Create an array with the colors you want to use
     data = {'Sample size':pandas_x_values, 'Area':pandas_y_values, 'Sampling method':p_samples} 
 
-    sns.set(font_scale=3)
+    sns.set(font_scale=1.1)
 
     # Create DataFrame
     df = pd.DataFrame(data) 
     svm = sns.lineplot(data=data, x="Sample size", y="Area", hue="Sampling method", color=sns.set_palette("Set2"))
     svm.set_title(f"Convergence of the estimated area with increased sample size")
 
-    plt.xticks(rotation=30)
+    plt.xticks(rotation=45)
     plt.tight_layout()
 
     figure = svm.get_figure()
     figure.savefig(f'images/samplesize/Ssize{major[0]}-{major[-1]}.png')
 
 def N_max_test():
-    N_max = [value for value in range(500, 2001, 300)]
-    major = [value for value in range(10, 16, 5)]
+    N_max = [value for value in range(100, 2001, 50)]
+    major = [value for value in range(10, 26, 5)]
     methods = ["Random", "LHS", "Orthogonal"]
     
     for method in methods:
@@ -65,7 +96,6 @@ def N_max_test():
         p_samples = []
         pandas_y_values = []
         pandas_x_values = []
-        pandas_change = []
         delta_area = []
         delta_x = []
         delta_samples = []
@@ -121,8 +151,8 @@ def N_max_test():
         figure.savefig(f'images/{method}deltaNmax{N_max[-1]}.png')
 
 if __name__=="__main__":
-    # sample_size()
-    N_max_test()
+    sample_size()
+    # N_max_test()
 
 
 
