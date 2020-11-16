@@ -50,12 +50,12 @@ def scale_points(points):
         y_l.append(i[1]-1.5)
 
     for i in anti_res:
-        x_a.append(i[0]-2)
-        y_a.append(i[1]-1.5)
+        x_a.append(i[0]+1)
+        y_a.append(i[1]+1.5)
     
     x_l = np.array(x_l)
     y_l = np.array(y_l)
     x_a = np.array(x_a)
     y_a = np.array(y_a)
-    
+
     return x_l, y_l, x_a, y_a

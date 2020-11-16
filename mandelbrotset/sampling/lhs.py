@@ -10,6 +10,7 @@ def lhs_sample(n_samples):
     Takes random n_samples with the lhs method.
     Returns array x and y.
     """
+    antithetic = False
     x = np.array([])
     y = np.array([])
     x_anti = np.array([])
@@ -21,21 +22,24 @@ def lhs_sample(n_samples):
     # Chooses which kind oh lhs will be used
     lhs = Lhs(lhs_type="classic", criterion=None)
 
+    coordinates = 0
     # Generates n_samples withhi the chosen space
-    coordinates = lhs.generate(space.dimensions, n_samples)
-
+    if antithetic:
+        coordinates = lhs.generate(space.dimensions, int(n_samples/2))
+    else:
+        coordinates = lhs.generate(space.dimensions, n_samples)
+    
     # appends all x and y values to array
     for coordinate in coordinates:
         a = coordinate[0]
         x = np.append(x,a)
-
-        a_anti = 3.0 - (a + 2.0)
-        x_anti = np.append(x_anti, a_anti) 
-
         b = coordinate[1]
         y = np.append(y,b)
-
-        b_anti = 3.0 - (b + 1.5)
-        y_anti = np.append(y_anti, b_anti) 
+        
+        if antithetic:
+            a_anti = 3.0 - (a + 2.0)
+            x = np.append(x, a_anti) 
+            b_anti = 3.0 - (b + 1.5)
+            y = np.append(y, b_anti)         
 
     return x, y, x_anti, y_anti
