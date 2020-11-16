@@ -7,7 +7,7 @@ from numpy import newaxis
 
 def ortho_sample(x, y, n_samples):
     """
-    Takes random n_samples with the orthogonal sampling method.
+    Uses the Ortho-package from canvas. Takes random n_samples with the orthogonal sampling method.
     Returns array x and y.
     """
     counter = 0
