@@ -10,9 +10,54 @@ import seaborn as sns
 from mandelbrotset.mandelbrot_area import compute_area_mandelbrot
 from mandelbrotset.mandelbrot_image import compute_image_mandelbrot
 
-if __name__=="__main__":
-    N_max = [value for value in range(50, 2001, 50)]
-    major = [value for value in range(10, 26, 5)]
+def sample_size():
+    N = 1000
+    major = [value for value in range(10, 34, 1)]
+    methods = ["Random", "LHS", "Orthogonal"]
+
+    antithetic = True
+    repetitions = 4
+    repeat = int(repetitions/2) if antithetic else repetitions
+    
+    p_samples = []
+    pandas_y_values = []
+    pandas_x_values = []
+
+    for method in methods:
+        print(method)
+        for m in major:
+            samples = m * m
+
+            for i in range(repeat):
+                result = compute_area_mandelbrot(N, 2, samples, method, antithetic)
+                p_samples.append(str(method))
+                pandas_x_values.append(str(samples))
+                pandas_y_values.append(result[2])
+
+                if antithetic:
+                    p_samples.append(str(method))
+                    pandas_x_values.append(str(samples))
+                    pandas_y_values.append(result[5])
+
+    # Create an array with the colors you want to use
+    data = {'Sample size':pandas_x_values, 'Area':pandas_y_values, 'Sampling method':p_samples} 
+
+    sns.set(font_scale=3)
+
+    # Create DataFrame
+    df = pd.DataFrame(data) 
+    svm = sns.lineplot(data=data, x="Sample size", y="Area", hue="Sampling method", color=sns.set_palette("Set2"))
+    svm.set_title(f"Convergence of the estimated area with increased sample size")
+
+    plt.xticks(rotation=30)
+    plt.tight_layout()
+
+    figure = svm.get_figure()
+    figure.savefig(f'images/samplesize/Ssize{major[0]}-{major[-1]}.png')
+
+def N_max_test():
+    N_max = [value for value in range(500, 2001, 300)]
+    major = [value for value in range(10, 16, 5)]
     methods = ["Random", "LHS", "Orthogonal"]
     
     for method in methods:
@@ -31,14 +76,14 @@ if __name__=="__main__":
             
             for N in N_max:
                 values = []
-                for i in range(10):
-                    ortho_c = compute_area_mandelbrot(N, 2, samples, method)
+                for i in range(2):
+                    result = compute_area_mandelbrot(N, 2, samples, method, False)
                     
                     p_samples.append(str(samples))
                     pandas_x_values.append(N)
-                    pandas_y_values.append(ortho_c[2])
+                    pandas_y_values.append(result[2])
 
-                    values.append(ortho_c[2])
+                    values.append(result[2])
 
                 mean.append(np.mean(values))
                 delta_x.append(N)
@@ -52,7 +97,7 @@ if __name__=="__main__":
         # Create an array with the colors you want to use
         data = {'Iterations':pandas_x_values, 'Area':pandas_y_values, 'Sample size':p_samples} 
 
-        sns.set(rc={'figure.figsize':(20,10)}, font_scale=3)
+        sns.set(font_scale=1.1)
         plt.figure()
 
         # Create DataFrame 
@@ -66,7 +111,7 @@ if __name__=="__main__":
         data = {'Iterations':delta_x, 'Delta area':delta_area, 'Sample size':delta_samples} 
 
         plt.figure()
-        sns.set(rc={'figure.figsize':(20,10)}, font_scale=3)
+        plt.xticks(fontsize=12)
 
         # Create DataFrame 
         df = pd.DataFrame(data) 
@@ -74,6 +119,14 @@ if __name__=="__main__":
         svm = sns.lineplot(data=data, x="Iterations", y="Delta area", hue="Sample size").set_title(f"Sampling method: {method}")
         figure = svm.get_figure()
         figure.savefig(f'images/{method}deltaNmax{N_max[-1]}.png')
+
+if __name__=="__main__":
+    # sample_size()
+    N_max_test()
+
+
+
+
 
     
     # N_max = [value for value in range(10, 101, 10)]
@@ -134,15 +187,3 @@ def N_maxtest():
     
     plt.legend()
     plt.show()
-
-
-    
-
-
-
-
-
-
-
-
-   

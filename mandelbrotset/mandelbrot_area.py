@@ -12,25 +12,23 @@ from .sampling.orthogonal import scale_points
 
 from .mandelbrotcompute import mandelbrot_computation
 
-def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind):
+def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind, antithetic):
     """
     Computes the Area of the mandel brot set with the monte carlo method.
     Takes as initial values N_max(integer), some_threshold(Number), n_samples(integer), kind(string = random, lhs, ortho)
     returns the amount of hits and the ratio of hits/total shots
     """
 
-    # Initializes values
     hits = 0
-    x = np.array([])
-    y = np.array([])
+    hits_anti = 0
 
     if kind == "Random":
-        sample = random_sample(x, y, n_samples)
+        sample = random_sample(n_samples)
     elif kind == "LHS":
-        sample = lhs_sample(x, y, n_samples)
+        sample = lhs_sample(n_samples)
     elif kind == "Orthogonal":
         sample = scale_points(n_samples)
-    
+        
     x = sample[0]
     y = sample[1]
 
@@ -48,5 +46,20 @@ def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind):
 
     # total plot area is 9 so ratio * 9
     area = ratio * 9
+
+    if antithetic:
+        x_a = sample[2]
+        y_a = sample[3]
+        mandelbrot_set = mandelbrot_computation(N_max, some_threshold, x_a, y_a)
+        
+        for row in mandelbrot_set:
+            for value in row:
+                if value == True:
+                    hits_anti+=1
+
+        ratio_anti = hits/n_samples**2
+        area_anti = ratio * 9
+
+        return hits, ratio, area, hits_anti, ratio_anti, area_anti
 
     return hits, ratio, area
