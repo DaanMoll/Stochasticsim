@@ -8,7 +8,7 @@ def ortho(ns):
     # Making a datastructure of a dict with coordinate tuples of a bigger grid with subcoordinate of sub-grid points
     blocks = {(i,j):[(a,b) for a in range(n) for b in range(n)] for i in range(n) for j in range(n)}
     points = []
-    append = points.append # tips of python to fasten up append call
+    append = points.append
 
     for block in blocks:
         point = random.choice(blocks[block])
@@ -33,60 +33,22 @@ def scale_points(points):
     p = ortho(points)
     maximum = points 
     scaling =[ 1/maximum * i for i in range(len(p))]
-    min_ = 0
-    max_ = 2
+    min_ = -1.5
+    max_ = 1.5
     result = np.zeros((points,2))
-    anti_res = np.zeros((points,2)) # this is for antithetic variables
 
+    # Scale points to domain (-1.5, 1.5)
     for idx, scale in enumerate(scaling):
-        x =  min_ + np.random.uniform(p[idx][0]/maximum, p[idx][0]/maximum +1/maximum ) * 3  # 4 is just max - min which is in my case 4
-        y =  min_ + np.random.uniform(p[idx][1]/maximum, p[idx][1]/maximum + 1/maximum ) * 3
-        result[idx, :] = [x,y]
+        x = min_ + np.random.uniform(p[idx][0] / maximum, p[idx][0] / maximum + 1 / maximum ) * 3
+        y = min_ + np.random.uniform(p[idx][1] / maximum, p[idx][1] / maximum + 1 / maximum ) * 3
+        result[idx, :] = [x, y]
 
+    # Set x to (-2,1) and proper list for mandelbrotset
     for i in result:
-        x_l.append(i[0]-2)
-        y_l.append(i[1]-1.5)
+        x_l.append(i[0]-0.5)
+        y_l.append(i[1])
     
     x_l = np.array(x_l)
     y_l = np.array(y_l)
 
     return x_l, y_l
-
-def scale_points_anti(points):
-    x_l = []
-    y_l = []
-    x_a = []
-    y_a = []
-    p = ortho(points)
-    maximum = points 
-    scaling =[ 1/maximum * i for i in range(len(p))]
-    
-    # Generate values within these ranges
-    min_ = -1.5
-    max_ = 1.5
-    result = np.zeros((points,2))
-    anti_res = np.zeros((points,2)) # this is for antithetic variables
-
-    for idx, scale in enumerate(scaling):
-        x =  min_ + np.random.uniform(p[idx][0]/maximum, p[idx][0]/maximum +1/maximum ) * 3  # 4 is just max - min which is in my case 4
-        y =  min_ + np.random.uniform(p[idx][1]/maximum, p[idx][1]/maximum + 1/maximum ) * 3
-        result[idx, :] = [x,y]
-        anti_res[idx, :] = [x*-1.0, y*-1.0] # antithetic variables
-
-    for i in result:
-        x_l.append(i[0]-0.5)
-        y_l.append(i[1])
-        
-        x_a.append(i[0]-0.5)
-        y_a.append(i[1])
-
-    for i in anti_res:
-        x_a.append(i[0]-0.5)
-        y_a.append(i[1])
-    
-    x_l = np.array(x_l)
-    y_l = np.array(y_l)
-    x_a = np.array(x_a)
-    y_a = np.array(y_a)
-
-    return x_l, y_l, x_a, y_a
