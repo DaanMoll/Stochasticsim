@@ -58,15 +58,30 @@ def lhs_sample_anti(n_samples):
     # appends all x and y values to array
     for coordinate in coordinates:
         a = coordinate[0]
+        
+        if a > 0:
+            a_anti = -0.5 - (a + 0.5)
+        elif a <= 0:
+            a_anti = -0.5 + ((a*-1.0) - 0.5)
+        
         x = np.append(x,a)
-        x_anti = np.append(x_anti,a)
+        
         b = coordinate[1]
+
+        if b > 0:
+            b_anti = 0 - b
+        elif b <= 0:
+            b_anti = 0 + b*-1.0
+        
         y = np.append(y,b)
-        y_anti = np.append(y_anti,b)
-    
-        a_anti = 3.0 - (a + 2.0)
+
+        x_anti = np.append(x_anti, a)
         x_anti = np.append(x_anti, a_anti) 
-        b_anti = 3.0 - (b + 1.5)
+        
+        b_anti = b * -1.0
+
+        y_anti = np.append(y_anti, b)
         y_anti = np.append(y_anti, b_anti)         
 
+    # print(x, "hoi\n", x_anti)
     return x, y, x_anti, y_anti

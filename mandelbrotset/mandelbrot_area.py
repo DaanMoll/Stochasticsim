@@ -69,10 +69,10 @@ def compute_area_mandelbrot_anti(N_max, some_threshold, n_samples, kind):
     
     for row in mandelbrot_set:
         for value in row:
-            if value == True:
+            if value:
                 hits_anti+=1
 
-    ratio_anti = hits_anti/n_samples**2
+    ratio_anti = hits_anti/((n_samples*2)**2)
     area_anti = ratio_anti * 9
 
     return hits_anti, ratio_anti, area_anti
