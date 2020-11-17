@@ -8,33 +8,87 @@ import pandas as pd
 import seaborn as sns
 import random
 
-from mandelbrotset.mandelbrot_area import compute_area_mandelbrot, compute_area_mandelbrot_anti
+from mandelbrotset.mandelbrot_area import compute_area_mandelbrot
 from mandelbrotset.mandelbrot_image import compute_image_mandelbrot
 
 def sample_size():
-    N = 200
-    major = [value for value in range(10, 11, 2)]
+    N = 1000
+    major = [value for value in range(10, 51, 2)]
     methods = ["Random", "LHS", "Orthogonal"]
 
     repetitions = 10
-    repeat = int(repetitions/2)
-    repeat = repetitions
-
     p_samples = []
     pandas_y_values = []
     pandas_x_values = []
 
     for method in methods:
-        print(method)
         for m in major:
             samples = m * m
-            print(samples)
-            for i in range(repeat):
+            for i in range(repetitions):
                 result = compute_area_mandelbrot(N, 2, samples, method)
-            
                 p_samples.append(method)
                 pandas_x_values.append(str(samples))
                 pandas_y_values.append(result[2])
+        
+    # Create an array with the colors you want to use
+    data = {'Sample size':pandas_x_values, 'Area':pandas_y_values, 'Sampling method':p_samples} 
+
+    sns.set(font_scale=1.1)
+
+    # Create DataFrame
+    df = pd.DataFrame(data) 
+    svm = sns.lineplot(data=data, x="Sample size", y="Area", hue="Sampling method", color=sns.set_palette("Set2"))
+    svm.set_title("Convergence of the estimated area with increased sample size")
+
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    figure = svm.get_figure()
+    figure.savefig(f'images/samplesize/Ssize{major[0]}-{major[-1]}.png')
+
+def sample_size_strat(method):
+    """Takes a method as an input to compare it to stratified random sampling."""
+    N = 1000
+    major = [value for value in range(10, 15, 2)]
+    repetitions = 100
+
+    p_samples = [] 
+    pandas_y_values = []
+    pandas_x_values = []
+    
+    var = []
+    var_strat = []
+
+    for m in major:
+        samples = m * m
+        var1 = []
+        var2_strat = []
+
+        for i in range(repetitions):
+            result = compute_area_mandelbrot(N, 2, samples, method)
+            p_samples.append(method)
+            pandas_x_values.append(str(samples))
+            pandas_y_values.append(result[2])
+            var1.append(result[2])
+
+            result = compute_area_mandelbrot(N, 2, samples, "Stratified Random")
+            var2_strat.append(result[2])
+            p_samples.append("Stratified")
+            pandas_x_values.append(str(samples))
+            pandas_y_values.append(result[2])
+                
+        var.append(var1)
+        var_strat.append(var2_strat)
+
+    for i in range(len(var)):
+        variation = np.var(var[i])
+        variation_strat = np.var(var_strat[i])
+        print("var at sample size:", major[i]**2)
+        print("Area means:", np.mean(var[i]), np.mean(var_strat[i]))
+        print(f"var {method}:", variation)
+        print("var stratified:", variation_strat)
+        print(f"var {method} / Stratified = ", variation / variation_strat)
+        print("If value is positive than anti variance is smaller")
         
     # Create an array with the colors you want to use
     data = {'Sample size':pandas_x_values, 'Area':pandas_y_values, 'Sampling method':p_samples} 
@@ -50,78 +104,7 @@ def sample_size():
     plt.tight_layout()
 
     figure = svm.get_figure()
-    figure.savefig(f'images/samplesize/Ssize{major[0]}-{major[-1]}.png')
-
-def sample_size_anti():
-    N = 1000
-    major = [value for value in range(5, 6, 2)]
-    methods = ["Random"]
-
-    repetitions = 100
-    repeat = repetitions
-
-    # p_samples = [] 
-    # p_anti_samples = []
-    # pandas_y_values = []
-    # pandas_y_anti_values = []
-    # pandas_x_values = []
-    # pandas_x_anti_values = []
-    
-    var = []
-    var_anti = []
-
-    for method in methods:
-        print(method)
-        for m in major:
-            samples = m * m
-            print(samples)
-            var1 = []
-            var2_anti = []
-
-            for i in range(repeat):
-                result = compute_area_mandelbrot(N, 2, samples, method)
-                # p_samples.append(method)
-                # pandas_x_values.append(str(samples))
-                # pandas_y_values.append(result[2])
-                var1.append(result[2])
-
-                result = compute_area_mandelbrot(N, 2, samples, "Random2")
-                # p_anti_samples.append(str(method))
-                # pandas_x_anti_values.append(str(samples))
-                # pandas_y_anti_values.append(result[2])
-                var2_anti.append(result[2])
-                    
-            var.append(var1)
-            var_anti.append(var2_anti)
-    
-    print(var)
-    print("\n\n")
-    print(var_anti)
-
-    for i in range(len(var)):
-        variation_normal = np.std(var[i])
-        variation_anti = np.std(var_anti[i])
-        print(major[i]**2)
-        print("var normal:", variation_normal)
-        print("var anti:", variation_anti)
-        print("var normal - anti = ", variation_normal - variation_anti)
-        print("If value is positive than anti variance is smaller")
-        
-    # # Create an array with the colors you want to use
-    # data = {'Sample size':pandas_x_values, 'Area':pandas_y_values, 'Sampling method':p_samples} 
-
-    # sns.set(font_scale=1.1)
-
-    # # Create DataFrame
-    # df = pd.DataFrame(data) 
-    # svm = sns.lineplot(data=data, x="Sample size", y="Area", hue="Sampling method", color=sns.set_palette("Set2"))
-    # svm.set_title(f"Convergence of the estimated area with increased sample size")
-
-    # plt.xticks(rotation=45)
-    # plt.tight_layout()
-
-    # figure = svm.get_figure()
-    # figure.savefig(f'images/samplesize/Ssize{major[0]}-{major[-1]}.png')
+    figure.savefig(f'images/samplesize/StratifiedSsize{major[0]}-{major[-1]}.png')
 
 
 def N_max_test():
@@ -130,7 +113,6 @@ def N_max_test():
     methods = ["Random", "LHS", "Orthogonal"]
     
     for method in methods:
-        print(method)
         p_samples = []
         pandas_y_values = []
         pandas_x_values = []
@@ -189,5 +171,5 @@ def N_max_test():
         figure.savefig(f'images/{method}deltaNmax{N_max[-1]}.png')
 
 if __name__=="__main__":
-    sample_size_anti()
+    sample_size_strat("Orthogonal")
     # N_max_test()
