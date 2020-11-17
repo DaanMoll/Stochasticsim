@@ -29,6 +29,31 @@ def ortho(ns):
 def scale_points(points):
     x_l = []
     y_l = []
+    p = ortho(points)
+    maximum = points 
+    scaling =[ 1/maximum * i for i in range(len(p))]
+    min_ = 0
+    max_ = 2
+    result = np.zeros((points,2))
+    anti_res = np.zeros((points,2)) # this is for antithetic variables
+
+    for idx, scale in enumerate(scaling):
+        x =  min_ + np.random.uniform(p[idx][0]/maximum, p[idx][0]/maximum +1/maximum ) * 3  # 4 is just max - min which is in my case 4
+        y =  min_ + np.random.uniform(p[idx][1]/maximum, p[idx][1]/maximum + 1/maximum ) * 3
+        result[idx, :] = [x,y]
+
+    for i in result:
+        x_l.append(i[0]-2)
+        y_l.append(i[1]-1.5)
+    
+    x_l = np.array(x_l)
+    y_l = np.array(y_l)
+
+    return x_l, y_l
+
+def scale_points_anti(points):
+    x_l = []
+    y_l = []
     x_a = []
     y_a = []
     p = ortho(points)
@@ -48,6 +73,9 @@ def scale_points(points):
     for i in result:
         x_l.append(i[0]-2)
         y_l.append(i[1]-1.5)
+        
+        x_a.append(i[0]-2)
+        y_a.append(i[1]-1.5)
 
     for i in anti_res:
         x_a.append(i[0]+1)

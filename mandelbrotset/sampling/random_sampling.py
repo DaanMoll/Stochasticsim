@@ -30,26 +30,30 @@ def random_sample(n_samples):
 
     return x, y, x_anti, y_anti
 
-def half_random_sample(n_samples):
+def random_sample_anti(n_samples):
     """
     Takes random n_samples from a uniform distribution.
     Returns arrays x and y.
     """
-    x= np.array([])
+    x = np.array([])
     y = np.array([])
     x_anti = np.array([])
     y_anti = np.array([])
 
     # Makes arrays of x and y values
-    for i in range(n_samples//2):
+    for i in range(n_samples):
         a = np.random.uniform(0,3.0)
-        a_anti = 3.0 - a
+        x = np.append(x,a-2)
         x_anti = np.append(x_anti,a-2)
+        
+        b = np.random.uniform(0,3.0)
+        y = np.append(y,b-1.5)
+        y_anti = np.append(y_anti,b-1.5)
+        
+        a_anti = 3.0 - a
         x_anti = np.append(x_anti, a_anti-2)
 
-        b = np.random.uniform(0,3.0)
         b_anti = 3.0 - b
-        y_anti = np.append(y_anti,b-1.5)
         y_anti = np.append(y_anti, b_anti-1.5)
 
     return x, y, x_anti, y_anti

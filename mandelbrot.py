@@ -8,67 +8,33 @@ import pandas as pd
 import seaborn as sns
 import random
 
-from mandelbrotset.mandelbrot_area import compute_area_mandelbrot
+from mandelbrotset.mandelbrot_area import compute_area_mandelbrot, compute_area_mandelbrot_anti
 from mandelbrotset.mandelbrot_image import compute_image_mandelbrot
 
 def sample_size():
-    N = 1000
-    major = [value for value in range(10, 42, 3)]
+    N = 200
+    major = [value for value in range(10, 11, 2)]
     methods = ["Random", "LHS", "Orthogonal"]
 
-    antithetic = False
-    repetitions = 40
-    repeat = int(repetitions/2) if antithetic else repetitions
+    repetitions = 10
+    repeat = int(repetitions/2)
     repeat = repetitions
 
     p_samples = []
     pandas_y_values = []
     pandas_x_values = []
-    
-    count = 0
-    var = []
-    var_anti = []
 
     for method in methods:
         print(method)
-        if count == 1:
-            print("anti is Flase", method)
-            antithetic = False
-
         for m in major:
             samples = m * m
             print(samples)
-            var1 = []
-            var2 = []
-
             for i in range(repeat):
-                result = compute_area_mandelbrot(N, 2, samples, method, antithetic)
-                
-                if not antithetic:
-                    # antithetic == false
-                    p_samples.append("ortho2")
-                    pandas_x_values.append(str(samples))
-                    pandas_y_values.append(result[2])
-                    var1.append(result[2])
-                elif antithetic:
-                    p_samples.append(str(method))
-                    pandas_x_values.append(str(samples))
-                    pandas_y_values.append(result[5])
-                    var2.append(result[5])
-                    
-            if not antithetic:
-                var.append(var1)
-            else:
-                var_anti.append(var2)
-        
-        count += 1
-        # if count == 2:
-        #     break
-    
-    for i in range(len(var)):
-        var3 = np.std(var[i])
-        var4 = np.std(var_anti[i])
-        print(major[i]**2, var3, var4, var3-var4, var3/var4)
+                result = compute_area_mandelbrot(N, 2, samples, method)
+            
+                p_samples.append(method)
+                pandas_x_values.append(str(samples))
+                pandas_y_values.append(result[2])
         
     # Create an array with the colors you want to use
     data = {'Sample size':pandas_x_values, 'Area':pandas_y_values, 'Sampling method':p_samples} 
@@ -85,6 +51,75 @@ def sample_size():
 
     figure = svm.get_figure()
     figure.savefig(f'images/samplesize/Ssize{major[0]}-{major[-1]}.png')
+
+def sample_size_anti():
+    N = 200
+    major = [value for value in range(10, 11, 2)]
+    methods = ["Random"]
+
+    repetitions = 100
+    repeat = repetitions
+
+    p_samples = [] 
+    p_anti_samples = []
+    pandas_y_values = []
+    pandas_y_anti_values = []
+    pandas_x_values = []
+    pandas_x_anti_values = []
+    
+    var = []
+    var_anti = []
+
+    for method in methods:
+        print(method)
+        for m in major:
+            samples = m * m
+            print(samples)
+            var1 = []
+            var2_anti = []
+
+            for i in range(repeat):
+                result = compute_area_mandelbrot(N, 2, samples, method)
+                
+                p_samples.append(method)
+                pandas_x_values.append(str(samples))
+                pandas_y_values.append(result[2])
+                var1.append(result[2])
+
+                result = compute_area_mandelbrot_anti(N, 2, samples, method)
+                p_anti_samples.append(str(method))
+                pandas_x_anti_values.append(str(samples))
+                pandas_y_anti_values.append(result[2])
+                var2_anti.append(result[2])
+                    
+            var.append(var1)
+            var_anti.append(var2_anti)
+        
+    for i in range(len(var)):
+        variation_normal = np.std(var[i])
+        variation_anti = np.std(var_anti[i])
+        print(major[i]**2)
+        print("var normal:", variation_normal)
+        print("var anti:", variation_anti)
+        print("var normal - anti = ", variation_normal - variation_anti)
+        print("If value is positive than anti variance is smaller")
+        
+    # # Create an array with the colors you want to use
+    # data = {'Sample size':pandas_x_values, 'Area':pandas_y_values, 'Sampling method':p_samples} 
+
+    # sns.set(font_scale=1.1)
+
+    # # Create DataFrame
+    # df = pd.DataFrame(data) 
+    # svm = sns.lineplot(data=data, x="Sample size", y="Area", hue="Sampling method", color=sns.set_palette("Set2"))
+    # svm.set_title(f"Convergence of the estimated area with increased sample size")
+
+    # plt.xticks(rotation=45)
+    # plt.tight_layout()
+
+    # figure = svm.get_figure()
+    # figure.savefig(f'images/samplesize/Ssize{major[0]}-{major[-1]}.png')
+
 
 def N_max_test():
     N_max = [value for value in range(100, 2001, 50)]
@@ -151,7 +186,7 @@ def N_max_test():
         figure.savefig(f'images/{method}deltaNmax{N_max[-1]}.png')
 
 if __name__=="__main__":
-    sample_size()
+    sample_size_anti()
     # N_max_test()
 
 
