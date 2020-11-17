@@ -6,7 +6,7 @@ from skopt.space import Space
 from numpy import newaxis
 
 from .sampling.lhs import lhs_sample, lhs_sample_anti
-from .sampling.random_sampling import random_sample, random_sample_anti
+from .sampling.random_sampling import random_sample, random_sample_anti, stratified_random_sample
 from .sampling.orthogonal import scale_points, scale_points_anti
 
 from .mandelbrotcompute import mandelbrot_computation
@@ -22,6 +22,8 @@ def compute_area_mandelbrot(N_max, some_threshold, n_samples, kind):
 
     if kind == "Random":
         sample = random_sample(n_samples)
+    elif kind == "Random2":
+        sample = stratified_random_sample(n_samples)
     elif kind == "LHS":
         sample = lhs_sample(n_samples)
     elif kind == "Orthogonal":

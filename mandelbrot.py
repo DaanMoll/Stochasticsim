@@ -53,9 +53,9 @@ def sample_size():
     figure.savefig(f'images/samplesize/Ssize{major[0]}-{major[-1]}.png')
 
 def sample_size_anti():
-    N = 500
-    major = [value for value in range(10, 11, 2)]
-    methods = ["Orthogonal"]
+    N = 1000
+    major = [value for value in range(5, 6, 2)]
+    methods = ["Random"]
 
     repetitions = 100
     repeat = repetitions
@@ -85,7 +85,7 @@ def sample_size_anti():
                 # pandas_y_values.append(result[2])
                 var1.append(result[2])
 
-                result = compute_area_mandelbrot_anti(N, 2, samples, method)
+                result = compute_area_mandelbrot(N, 2, samples, "Random2")
                 # p_anti_samples.append(str(method))
                 # pandas_x_anti_values.append(str(samples))
                 # pandas_y_anti_values.append(result[2])
