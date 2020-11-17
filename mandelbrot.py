@@ -53,19 +53,19 @@ def sample_size():
     figure.savefig(f'images/samplesize/Ssize{major[0]}-{major[-1]}.png')
 
 def sample_size_anti():
-    N = 200
+    N = 500
     major = [value for value in range(10, 11, 2)]
-    methods = ["Random"]
+    methods = ["Orthogonal"]
 
     repetitions = 100
     repeat = repetitions
 
-    p_samples = [] 
-    p_anti_samples = []
-    pandas_y_values = []
-    pandas_y_anti_values = []
-    pandas_x_values = []
-    pandas_x_anti_values = []
+    # p_samples = [] 
+    # p_anti_samples = []
+    # pandas_y_values = []
+    # pandas_y_anti_values = []
+    # pandas_x_values = []
+    # pandas_x_anti_values = []
     
     var = []
     var_anti = []
@@ -80,21 +80,24 @@ def sample_size_anti():
 
             for i in range(repeat):
                 result = compute_area_mandelbrot(N, 2, samples, method)
-                
-                p_samples.append(method)
-                pandas_x_values.append(str(samples))
-                pandas_y_values.append(result[2])
+                # p_samples.append(method)
+                # pandas_x_values.append(str(samples))
+                # pandas_y_values.append(result[2])
                 var1.append(result[2])
 
                 result = compute_area_mandelbrot_anti(N, 2, samples, method)
-                p_anti_samples.append(str(method))
-                pandas_x_anti_values.append(str(samples))
-                pandas_y_anti_values.append(result[2])
+                # p_anti_samples.append(str(method))
+                # pandas_x_anti_values.append(str(samples))
+                # pandas_y_anti_values.append(result[2])
                 var2_anti.append(result[2])
                     
             var.append(var1)
             var_anti.append(var2_anti)
-        
+    
+    print(var)
+    print("\n\n")
+    print(var_anti)
+
     for i in range(len(var)):
         variation_normal = np.std(var[i])
         variation_anti = np.std(var_anti[i])
@@ -188,67 +191,3 @@ def N_max_test():
 if __name__=="__main__":
     sample_size_anti()
     # N_max_test()
-
-
-
-
-
-    
-    # N_max = [value for value in range(10, 101, 10)]
-    # major = [value for value in range(10, 20, 5)]
-    # methods = ["random", "lhs", "ortho"]
-
-    # for method in methods:
-    #     for m in major:
-    #         n = m * m
-    #         areas = []
-    #         for N in N_max:
-    #             mean = []
-    #             for _ in range(10):
-    #                 result = compute_area_mandelbrot(N, 5, n, method)
-    #                 mean.append(result[2])
-    #             areas.append(np.mean(mean))
-    #         plt.plot(N_max, areas, label=f"{n} samples, {method}")
-    #     plt.legend()
-    #     plt.show()
-
-def N_maxtest():    
-    N_max = [10, 20, 50, 100, 200, 500, 600, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000]
-    major = 10
-    n = major * major
-
-    r_areas = []
-    lhs_areas = []
-    ortho_areas= []
-
-    for N in N_max:
-        r_mean = []
-        lhs_mean = []
-        ortho_mean = []
-
-        for _ in range(10):
-            random = compute_area_mandelbrot(N, 5, n, "random")
-            lhs = compute_area_mandelbrot(N, 5, n, "lhs")
-            ortho = compute_area_mandelbrot(N, 5, n, "ortho")
-            
-            r_mean.append(random[2])
-            lhs_mean.append(lhs[2])
-            ortho_mean.append(ortho[2])
-        
-        r_areas.append(np.mean(r_mean))
-        lhs_areas.append(np.mean(lhs_mean))
-        ortho_areas.append(np.mean(ortho_mean))
-        # print("mean N:", N, np.mean(r_mean),np.mean(lhs_mean), np.mean(ortho_mean))
-
-    r_diff = [abs(area-ortho_areas[-1]) for area in r_areas]
-    lhs_diff = [abs(area-lhs_areas[-1]) for area in lhs_areas]
-    ortho_diff = [abs(area-ortho_areas[-1]) for area in ortho_areas]
-
-    plt.plot(N_max, r_diff, label=f"Rand")
-    plt.plot(N_max, lhs_diff, label=f"Lhs")
-    plt.plot(N_max, ortho_diff, label=f"Ortho")
-
-    # print(r_areas[-1], lhs_areas[-1], ortho_areas[-1])
-    
-    plt.legend()
-    plt.show()

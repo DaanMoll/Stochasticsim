@@ -42,11 +42,15 @@ def random_sample_anti(n_samples):
 
     # Makes arrays of x and y values
     for i in range(n_samples):
-        a = np.random.uniform(0,3.0)
+        aa = np.random.uniform(0,3.0,4)
+        a = random.choice(aa)
+
         x = np.append(x,a-2)
         x_anti = np.append(x_anti,a-2)
         
-        b = np.random.uniform(0,3.0)
+        bb = np.random.uniform(0,3.0,4)
+        b = random.choice(bb)
+
         y = np.append(y,b-1.5)
         y_anti = np.append(y_anti,b-1.5)
         
