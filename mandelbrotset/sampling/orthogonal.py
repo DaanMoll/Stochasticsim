@@ -7,7 +7,7 @@ def ortho(ns):
     n = int(np.sqrt(ns))
     # Making a datastructure of a dict with coordinate tuples of a bigger grid with subcoordinate of sub-grid points
     blocks = {(i,j):[(a,b) for a in range(n) for b in range(n)] for i in range(n) for j in range(n)}
-    points = []#np.empty((n,2))
+    points = []
     append = points.append # tips of python to fasten up append call
 
     for block in blocks:
@@ -21,7 +21,7 @@ def ortho(ns):
         for row in lst_row:
             blocks[row] = [a for a in blocks[row] if a[0] != point[0]]
 
-        #Adjust the points to fit the grid they fall in  
+        # Adjust the points to fit the grid they fall in  
         point = (point[0] + n * block[0], point[1] + n * block[1])
         append(point)
 
@@ -60,6 +60,8 @@ def scale_points_anti(points):
     p = ortho(points)
     maximum = points 
     scaling =[ 1/maximum * i for i in range(len(p))]
+    
+    # Generate values within these ranges
     min_ = -1.5
     max_ = 1.5
     result = np.zeros((points,2))
@@ -69,7 +71,7 @@ def scale_points_anti(points):
         x =  min_ + np.random.uniform(p[idx][0]/maximum, p[idx][0]/maximum +1/maximum ) * 3  # 4 is just max - min which is in my case 4
         y =  min_ + np.random.uniform(p[idx][1]/maximum, p[idx][1]/maximum + 1/maximum ) * 3
         result[idx, :] = [x,y]
-        anti_res[idx,:] = [x*-1.0, y*-1.0] # antithetic variables
+        anti_res[idx, :] = [x*-1.0, y*-1.0] # antithetic variables
 
     for i in result:
         x_l.append(i[0]-0.5)
