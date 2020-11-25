@@ -26,7 +26,7 @@ c_group = []
 cs = [1,2,4]
 
 for C in cs:
-    for _ in range(100):
+    for _ in range(1000):
         waiting_time = []
         RANDOM_SEED = random.randint(1, 600)
         NEW_CUSTOMERS = 1100  # Total number of customers
@@ -36,7 +36,7 @@ for C in cs:
         def source(env, number, interval, counter):
             """Source generates customers randomly"""
             for i in range(number):
-                c = customer(env, 'Customer%02d' % i, counter, i, time_in_bank=9.0)
+                c = customer(env, 'Customer%02d' % i, counter, i, time_in_bank=5.0)
                 env.process(c)
                 t = random.expovariate(1/interval)
                 yield env.timeout(t)
@@ -45,8 +45,9 @@ for C in cs:
         def customer(env, name, counter, i, time_in_bank):
             """Customer arrives, is served and leaves."""
             arrive = env.now
+            tib = random.expovariate(1/time_in_bank)
             # print('%7.4f %s: Here I am' % (arrive, name))
-
+            
             with counter.request() as req:
 
                 # Wait for the counter
@@ -60,18 +61,15 @@ for C in cs:
                 # We got to the counter
                 # print('%7.4f %s: Waited %6.3f' % (env.now, name, wait))
 
-                tib = random.expovariate(1/time_in_bank)
+                
                 yield env.timeout(tib)
                 # print('%7.4f %s: Finished' % (env.now, name))
 
-
-        # Setup and start the simulation
-        # print('Bank renege')
         random.seed(RANDOM_SEED)
         env = simpy.Environment()
 
         # Start processes and run
-        counter = simpy.Resource(env, capacity=C)
+        counter = simpy.resources.resource.Resource(env, capacity=C)
         env.process(source(env, NEW_CUSTOMERS, INTERVAL_CUSTOMERS/C, counter))
         env.run()
 
@@ -80,26 +78,6 @@ for C in cs:
 
 data = {'Servers':c_group, "Values":c_values}
 df = pd.DataFrame(data) 
-
 df
+df.to_csv("values.csv")
 
-server_1 = df.loc[df['Servers'] == '1 server(s)']["Values"]
-servers_2 = df.loc[df['Servers'] == '2 server(s)']["Values"]
-servers_4 = df.loc[df['Servers'] == '4 server(s)']["Values"]
-
-fvalue, pvalue = stats.f_oneway(server_1, servers_2, servers_4)
-
-print(fvalue, pvalue)
-
-Post_hoc = sp.posthoc_ttest(df, val_col='Values', group_col='Servers', p_adjust='holm')
-
-print(Post_hoc)
-
-
-
-plt.style.use('ggplot')
-ax = sns.boxplot(x="Servers", y="Values", data=data)
-plt.ylabel("Waiting time")
-
-plt.show()
-print(c_values, c_group)
