@@ -54,8 +54,6 @@ for C in cs:
                 wait = env.now - arrive
 
                 waiting_time.append(wait)
-                
-                
 
                 # We got to the counter
                 # print('%7.4f %s: Waited %6.3f' % (env.now, name, wait))
