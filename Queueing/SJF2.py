@@ -31,8 +31,6 @@ def customer(env, name, counter, i, job_time):
         yield req
 
         wait = env.now - arrive
-        helped = env.now
-
         # We got to the counter
         print('%7.4f %s: Waited %6.3f' % (env.now, name, wait))
 
