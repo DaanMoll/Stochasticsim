@@ -8,7 +8,6 @@ def assignment_1():
     data = pd.read_csv('values.csv') 
     df = pd.DataFrame(data) 
 
-
     server_1 = df.loc[df['Servers'] == '1 server(s)']["Values"]
     servers_2 = df.loc[df['Servers'] == '2 server(s)']["Values"]
     servers_4 = df.loc[df['Servers'] == '4 server(s)']["Values"]
@@ -20,14 +19,15 @@ def assignment_1():
     print("\n")
     fvalue, pvalue = stats.f_oneway(server_1, servers_2, servers_4)
 
+    # p value lager dan 0.05 dus significant verschil tussen de 3
     print(fvalue, pvalue)
 
     Post_hoc = sp.posthoc_ttest(df, val_col='Values', group_col='Servers', p_adjust='holm')
 
     print(Post_hoc)
+    print("hoi")
 
     print("\n", stats.ttest_ind(server_1,servers_2))
-
 
     plt.style.use('ggplot')
     ax = sns.boxplot(x="Servers", y="Values", data=data)

@@ -1,13 +1,13 @@
 import random
 import simpy
-from matplotlib import pyplot as plt
-import numpy as np
 
 c = 1
 runtime = 100
+
+waiting_time = []
 RANDOM_SEED = random.randint(1, 600)
 # Total number of customers
-NEW_CUSTOMERS = 500  
+NEW_CUSTOMERS = 1100  
 # Generate new customers roughly every x seconds
 INTERVAL_CUSTOMERS = 10
 
@@ -31,6 +31,8 @@ def customer(env, name, counter, i, job_time):
         yield req
 
         wait = env.now - arrive
+        helped = env.now
+
         # We got to the counter
         print('%7.4f %s: Waited %6.3f' % (env.now, name, wait))
 
@@ -46,4 +48,4 @@ env = simpy.Environment()
 # Start processes and run
 counter = simpy.resources.resource.PriorityResource(env, capacity=c)
 env.process(source(env, NEW_CUSTOMERS, INTERVAL_CUSTOMERS/c, counter))
-env.run()
+env.run(runtime)
