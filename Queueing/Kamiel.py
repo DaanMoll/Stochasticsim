@@ -26,7 +26,7 @@ for C in cs:
                 t = random.expovariate(1/interval)
                 yield env.timeout(t)
 
-        def customer(env, name, counter, i, job_time):
+        def customer(env, name, counter, i, time_in_bank):
             """Customer arrives, is served and leaves."""
             arrive = env.now
             tib = random.expovariate(1/time_in_bank)
@@ -39,12 +39,9 @@ for C in cs:
                 if i > 100:
                     waiting_time.append(wait)
                 
-                
-
                 # We got to the counter
                 # print('%7.4f %s: Waited %6.3f' % (env.now, name, wait))
 
-                
                 yield env.timeout(tib)
                 # print('%7.4f %s: Finished' % (env.now, name))
 
