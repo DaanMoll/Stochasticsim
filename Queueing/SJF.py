@@ -2,6 +2,8 @@ import random
 import numpy as np
 import pandas as pd
 import simpy
+from matplotlib import pyplot as plt
+import numpy as np
 
 c = 1
 
@@ -9,11 +11,11 @@ c1 = []
 simmulation = []
 
 runtime = 100
-for i in range(100):
+for i in range(500):
     waiting_time = []
-    RANDOM_SEED = random.randint(1, 600)
+    RANDOM_SEED = random.randint(1, 6000)
     # Total number of customers
-    NEW_CUSTOMERS = 1100  
+    NEW_CUSTOMERS = 5000  
     # Generate new customers roughly every x seconds
     INTERVAL_CUSTOMERS = 10
 
