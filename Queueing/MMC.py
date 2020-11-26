@@ -15,13 +15,13 @@ for C in cs:
     for _ in range(500):
         waiting_time = []
         RANDOM_SEED = random.randint(1, 6000)
-        NEW_CUSTOMERS = 100
+        NEW_CUSTOMERS = 10000
         INTERVAL_CUSTOMERS = 10 
 
         def source(env, number, interval, counter):
             """Source generates customers randomly"""
             for i in range(number):
-                c = customer(env, 'Customer%02d' % i, counter, i, job_time=1)
+                c = customer(env, 'Customer%02d' % i, counter, i, job_time=9)
                 env.process(c)
                 t = random.expovariate(1/interval)
                 yield env.timeout(t)
@@ -39,12 +39,9 @@ for C in cs:
                 # if i > 100:
                 waiting_time.append(wait)
                 
-                
-
                 # We got to the counter
                 # print('%7.4f %s: Waited %6.3f' % (env.now, name, wait))
 
-                
                 yield env.timeout(tib)
                 # print('%7.4f %s: Finished' % (env.now, name))
 
