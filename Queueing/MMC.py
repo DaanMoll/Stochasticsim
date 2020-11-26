@@ -12,32 +12,32 @@ c_group = []
 cs = [1,2,4]
 
 for C in cs:
-    for _ in range(1000):
+    for _ in range(500):
         waiting_time = []
-        RANDOM_SEED = random.randint(1, 600)
-        NEW_CUSTOMERS = 1100
+        RANDOM_SEED = random.randint(1, 6000)
+        NEW_CUSTOMERS = 10000
         INTERVAL_CUSTOMERS = 10 
 
         def source(env, number, interval, counter):
             """Source generates customers randomly"""
             for i in range(number):
-                c = customer(env, 'Customer%02d' % i, counter, i, time_in_bank=5.0)
+                c = customer(env, 'Customer%02d' % i, counter, i, job_time=9)
                 env.process(c)
                 t = random.expovariate(1/interval)
                 yield env.timeout(t)
 
-        def customer(env, name, counter, i, time_in_bank):
+        def customer(env, name, counter, i, job_time):
             """Customer arrives, is served and leaves."""
             arrive = env.now
-            tib = random.expovariate(1/time_in_bank)
+            tib = random.expovariate(1/job_time)
             # print('%7.4f %s: Here I am' % (arrive, name))
             
             with counter.request() as req:
                 # Wait for the counter
                 yield req
                 wait = env.now - arrive
-                if i > 100:
-                    waiting_time.append(wait)
+                # if i > 100:
+                waiting_time.append(wait)
                 
                 # We got to the counter
                 # print('%7.4f %s: Waited %6.3f' % (env.now, name, wait))
@@ -59,5 +59,6 @@ for C in cs:
 data = {'Servers':c_group, "Values":c_values}
 df = pd.DataFrame(data) 
 df
-df.to_csv("values.csv")
+df.to_csv("MMC_values.csv")
 
+print("Done")

@@ -62,14 +62,14 @@ for INTERVAL_CUSTOMERS in INTERVAL_CUSTOMERSS:
         all_waits.append(round(np.mean(waiting), 2))
 
         wait_values.append(round(np.mean(waiting), 2))
-        wait_group.append(f"{INTERVAL_CUSTOMERS} customer(s)")
+        wait_group.append(f" Value: {1/INTERVAL_CUSTOMERS}")
 
     plt.hist(all_waits, label=INTERVAL_CUSTOMERS)
 
-data = {'Customers':wait_group, "Values":wait_values}
+data = {'Rho':wait_group, "Values":wait_values}
 df = pd.DataFrame(data) 
 df
 df.to_csv("wait_values.csv")
 
-plt.legend()
-plt.show()
+# plt.legend()
+# plt.show()
