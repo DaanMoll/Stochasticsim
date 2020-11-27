@@ -4,27 +4,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-cc = [1, 2]
-runtime = 100
-# Total number of customers
-NEW_CUSTOMERS = 1000
-# Generate new customers roughly every x seconds
+NEW_CUSTOMERS = 10000
 INTERVAL_CUSTOMERS = 10
 
-wait_values = []
-wait_group = []
+c_values = []
+c_group = []
+cs = [1, 2, 4]
 
-for c in cc:
+for C in cs:
     all_waits = []
-
     for _ in range(500):
-        waiting = []
+        waiting_time = []
         RANDOM_SEED = random.randint(1, 6000)
 
         def source(env, number, interval, counter):
             """Source generates customers randomly"""
             for i in range(number):
-                c = customer(env, 'Customer%02d' % i, counter, i, job_time=1.0)
+                c = customer(env, 'Customer%02d' % i, counter, i, job_time=9.0)
                 env.process(c)
                 t = random.expovariate(1/interval)
                 yield env.timeout(t)
@@ -40,7 +36,7 @@ for c in cc:
 
                 wait = env.now - arrive
 
-                waiting.append(wait)
+                waiting_time.append(wait)
 
                 # We got to the counter
                 # print('%7.4f %s: Waited %6.3f' % (env.now, name, wait))
@@ -54,21 +50,21 @@ for c in cc:
         env = simpy.Environment()
 
         # Start processes and run
-        counter = simpy.Resource(env, capacity=c)
-        env.process(source(env, NEW_CUSTOMERS, INTERVAL_CUSTOMERS/c, counter))
+        counter = simpy.Resource(env, capacity=C)
+        env.process(source(env, NEW_CUSTOMERS, INTERVAL_CUSTOMERS/C, counter))
         env.run()
 
-        all_waits.append(round(np.mean(waiting), 2))
+        # all_waits.append(round(np.mean(waiting_time), 2))
 
-        wait_values.append(round(np.mean(waiting), 2))
-        wait_group.append(f"{INTERVAL_CUSTOMERS} customer(s)")
+        c_values.append(np.mean(waiting_time))
+        c_group.append(f"{C} server(s)")
 
-    plt.hist(all_waits, label=c)
+    # plt.hist(all_waits, label=C)
 
-data = {'Customers':wait_group, "Values":wait_values}
+data = {'Servers':c_group, "Values":c_values}
 df = pd.DataFrame(data) 
 df
-df.to_csv("wait_values.csv")
+df.to_csv("MDC_values.csv")
 
-plt.legend()
-plt.show()
+# plt.legend()
+# plt.show()
