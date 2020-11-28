@@ -9,56 +9,60 @@ import simpy
 
 c_values = []
 c_group = []
+customers = []
 cs = [1,2,4]
+NEW_CUSTOMERS = [50000, 100000, 200000, 300000]
 
 for C in cs:
-    for _ in range(500):
-        waiting_time = []
-        RANDOM_SEED = random.randint(1, 000)
-        NEW_CUSTOMERS = 20000
-        INTERVAL_CUSTOMERS = 10 
+    for amount_customer in NEW_CUSTOMERS:    
+        for _ in range(1000):
+            waiting_time = []
+            RANDOM_SEED = random.randint(1,100000000)
+            NEW_CUSTOMERS = amount_customer
+            INTERVAL_CUSTOMERS = 10 
 
-        def source(env, number, interval, counter):
-            """Source generates customers randomly"""
-            for i in range(number):
-                c = customer(env, 'Customer%02d' % i, counter, i, job_time=9)
-                env.process(c)
-                t = random.expovariate(1/interval)
-                yield env.timeout(t)
+            def source(env, number, interval, counter):
+                """Source generates customers randomly"""
+                for i in range(number):
+                    c = customer(env, 'Customer%02d' % i, counter, i, job_time=9)
+                    env.process(c)
+                    t = random.expovariate(1/interval)
+                    yield env.timeout(t)
 
-        def customer(env, name, counter, i, job_time):
-            """Customer arrives, is served and leaves."""
-            arrive = env.now
-            tib = random.expovariate(1/job_time)
-            # print('%7.4f %s: Here I am' % (arrive, name))
-            
-            with counter.request() as req:
-                # Wait for the counter
-                yield req
-                wait = env.now - arrive
-                # if i > 100:
-                waiting_time.append(wait)
+            def customer(env, name, counter, i, job_time):
+                """Customer arrives, is served and leaves."""
+                arrive = env.now
+                tib = random.expovariate(1/job_time)
+                # print('%7.4f %s: Here I am' % (arrive, name))
                 
-                # We got to the counter
-                # print('%7.4f %s: Waited %6.3f' % (env.now, name, wait))
+                with counter.request() as req:
+                    # Wait for the counter
+                    yield req
+                    wait = env.now - arrive
+                    # if i > 100:
+                    waiting_time.append(wait)
+                    
+                    # We got to the counter
+                    # print('%7.4f %s: Waited %6.3f' % (env.now, name, wait))
 
-                yield env.timeout(tib)
-                # print('%7.4f %s: Finished' % (env.now, name))
+                    yield env.timeout(tib)
+                    # print('%7.4f %s: Finished' % (env.now, name))
 
-        random.seed(RANDOM_SEED)
-        env = simpy.Environment()
+            random.seed(RANDOM_SEED)
+            env = simpy.Environment()
 
-        # Start processes and run
-        counter = simpy.resources.resource.Resource(env, capacity=C)
-        env.process(source(env, NEW_CUSTOMERS, INTERVAL_CUSTOMERS/C, counter))
-        env.run()
+            # Start processes and run
+            counter = simpy.resources.resource.Resource(env, capacity=C)
+            env.process(source(env, NEW_CUSTOMERS, INTERVAL_CUSTOMERS/C, counter))
+            env.run()
 
-        c_values.append(np.mean(waiting_time))
-        c_group.append(f"{C} server(s)")
+            customers.append(f"{amount_customer}")
+            c_values.append(np.mean(waiting_time))
+            c_group.append(f"{C} server(s)")
     
-data = {'Servers':c_group, "Values":c_values}
+data = {'Servers':c_group, "Values":c_values, "Amount of Customers":customers}
 df = pd.DataFrame(data) 
 df
-df.to_csv("MMC_values.csv")
+df.to_csv("MMC_values2.csv")
 
 print("Done")
