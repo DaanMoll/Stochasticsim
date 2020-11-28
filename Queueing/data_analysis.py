@@ -3,7 +3,7 @@ import scikit_posthocs as sp
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+from matplotlib import rcParams
 
 plt.style.use('ggplot')
 def comparing_servers():
@@ -17,8 +17,9 @@ def comparing_servers():
     ax1 = sns.displot(data, x="Values", hue="Servers", kde=True)
     
     plt.xlabel("Waiting time")
-
-    ax1.savefig('images/Comparing_servers_distr.png')
+    plt.title("Distributions servers")
+    plt.xlim(0,200)
+    # ax1.savefig('images/Comparing_servers_distr.png')
     plt.show()
     
     print(stats.shapiro(server_1))
@@ -44,8 +45,9 @@ def comparing_servers():
     b = sns.boxplot(x="Servers", y="Values", data=data)
     plt.ylabel("Waiting time")
 
+    plt.title("Comparing servers")
     figure = b.get_figure()
-    figure.savefig('images/Boxplot1_comp.png')
+    # figure.savefig('images/Boxplot1_comp.png')
     plt.show()
     
 
@@ -55,14 +57,16 @@ def rho_measures():
     df = pd.DataFrame(data)
     ax = sns.displot(data, x="Values", hue="Rho", kde=True)
 
-    Customers_5 = df.loc[df['Rho'] == ' Value: 0.1']["Values"]
-    Customers_10 = df.loc[df['Rho'] == ' Value: 0.2']["Values"]
-
+    Customers_1 = df.loc[df['Rho'] == ' Value: 0.1']["Values"]
+    Customers_2 = df.loc[df['Rho'] == ' Value: 0.2']["Values"]
+    Customers_3 = df.loc[df['Rho'] == ' Value: 0.25']["Values"]
     plt.xlabel("Waiting time")
 
-    print(stats.shapiro(Customers_10))
-    print(stats.shapiro(Customers_5))
-
+    print(stats.shapiro(Customers_1))
+    print(stats.shapiro(Customers_2))
+    print(stats.shapiro(Customers_3))
+    rcParams['figure.figsize'] = 11.7,8.27
+    plt.title("Distributions for different rhos")
     ax.savefig('images/Rho_measures.png')
     plt.show()
 
@@ -85,6 +89,7 @@ def comparing_SJF():
     print("\n", stats.ttest_ind(server_1["Values"],server_SJF["Values"]))
     ax = sns.boxplot(x="Servers", y="Values", data=result)
     plt.ylabel("Waiting time")
+    plt.title("Comparing SJF to normal")
 
     figure = ax.get_figure()
     figure.savefig('images/Boxplot2_comp.png')
@@ -92,5 +97,5 @@ def comparing_SJF():
 
 
 # rho_measures()
-# comparing_servers()
-comparing_SJF()
+comparing_servers()
+# comparing_SJF()

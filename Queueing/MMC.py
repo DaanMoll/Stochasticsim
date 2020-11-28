@@ -14,8 +14,8 @@ cs = [1,2,4]
 for C in cs:
     for _ in range(500):
         waiting_time = []
-        RANDOM_SEED = random.randint(1, 6000)
-        NEW_CUSTOMERS = 10000
+        RANDOM_SEED = random.randint(1, 000)
+        NEW_CUSTOMERS = 20000
         INTERVAL_CUSTOMERS = 10 
 
         def source(env, number, interval, counter):

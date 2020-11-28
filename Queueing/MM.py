@@ -7,9 +7,9 @@ import pandas as pd
 c = 1
 runtime = 100
 # Total number of customers
-NEW_CUSTOMERS = 1000
+NEW_CUSTOMERS = 2000
 # Generate new customers roughly every x seconds
-INTERVAL_CUSTOMERSS = [5, 10]
+INTERVAL_CUSTOMERSS = [4 , 5, 10]
 
 wait_values = []
 wait_group = []

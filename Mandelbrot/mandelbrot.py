@@ -42,7 +42,7 @@ def sample_size():
 
     plt.xticks(rotation=45)
     plt.tight_layout()
-
+    
     figure = svm.get_figure()
     figure.savefig(f'images/samplesize/Ssize{major[0]}-{major[-1]}.png')
 
