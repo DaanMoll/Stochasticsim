@@ -5,7 +5,7 @@ c = 1
 runtime = 100
 
 waiting_time = []
-RANDOM_SEED = random.randint(1, 600)
+RANDOM_SEED = random.randint(1, 100000000)
 # Total number of customers
 NEW_CUSTOMERS = 1100  
 # Generate new customers roughly every x seconds

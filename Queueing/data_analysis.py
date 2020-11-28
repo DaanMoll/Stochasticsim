@@ -6,8 +6,10 @@ import seaborn as sns
 from matplotlib import rcParams
 
 plt.style.use('ggplot')
+queueing_type = "MDC"
+
 def comparing_servers():
-    data = pd.read_csv('MMC_values.csv') 
+    data = pd.read_csv(f'{queueing_type}_values.csv') 
     df = pd.DataFrame(data) 
 
     server_1 = df.loc[df['Servers'] == '1 server(s)']["Values"]
@@ -17,9 +19,9 @@ def comparing_servers():
     ax1 = sns.displot(data, x="Values", hue="Servers", kde=True)
     
     plt.xlabel("Waiting time")
-    plt.title("Distributions servers")
-    plt.xlim(0,200)
-    # ax1.savefig('images/Comparing_servers_distr.png')
+    plt.title(queueing_type)
+
+    ax1.savefig(f'images/{queueing_type}_Comp_servers.png')
     plt.show()
     
     print(stats.shapiro(server_1))
@@ -35,7 +37,6 @@ def comparing_servers():
     Post_hoc = sp.posthoc_ttest(df, val_col='Values', group_col='Servers', p_adjust='holm')
 
     print(Post_hoc)
-    print("hoi")
 
     # Kruskal analysis, not normal distributed
     print("\n", stats.kruskal(server_1, servers_2, servers_4))
@@ -43,17 +44,16 @@ def comparing_servers():
     print(Post_hoc_con)
 
     b = sns.boxplot(x="Servers", y="Values", data=data)
+    b.set_title(queueing_type)
     plt.ylabel("Waiting time")
 
     plt.title("Comparing servers")
     figure = b.get_figure()
-    # figure.savefig('images/Boxplot1_comp.png')
+    figure.savefig(f'images/{queueing_type}_Boxplot1_comp.png')
     plt.show()
     
-
-
 def rho_measures():
-    data = pd.read_csv("wait_values.csv")
+    data = pd.read_csv(f'{queueing_type}_wait_values.csv') 
     df = pd.DataFrame(data)
     ax = sns.displot(data, x="Values", hue="Rho", kde=True)
 
@@ -62,12 +62,10 @@ def rho_measures():
     Customers_3 = df.loc[df['Rho'] == ' Value: 0.25']["Values"]
     plt.xlabel("Waiting time")
 
-    print(stats.shapiro(Customers_1))
-    print(stats.shapiro(Customers_2))
-    print(stats.shapiro(Customers_3))
-    rcParams['figure.figsize'] = 11.7,8.27
-    plt.title("Distributions for different rhos")
-    ax.savefig('images/Rho_measures.png')
+    print(stats.shapiro(Customers_10))
+    print(stats.shapiro(Customers_5))
+
+    ax.savefig(f'images/{queueing_type}_Rho_measures.png')
     plt.show()
 
 def comparing_SJF():
@@ -88,14 +86,35 @@ def comparing_SJF():
   
     print("\n", stats.ttest_ind(server_1["Values"],server_SJF["Values"]))
     ax = sns.boxplot(x="Servers", y="Values", data=result)
+    ax.set_title("Longtail")
     plt.ylabel("Waiting time")
     plt.title("Comparing SJF to normal")
 
     figure = ax.get_figure()
-    figure.savefig('images/Boxplot2_comp.png')
+    figure.savefig(f'images/SJF_Boxplot_comp.png')
     plt.show()
 
 
+def a():
+    data = pd.read_csv('MMC_values2.csv') 
+    df = pd.DataFrame(data) 
+
+    a =  df.loc[(df['Servers'] == '1 server(s)') & (df['Amount of Customers'] == 50000)]["Values"]
+    b =  df.loc[(df['Servers'] == '1 server(s)') & (df['Amount of Customers'] == 100000)]["Values"]
+    c =  df.loc[(df['Servers'] == '1 server(s)') & (df['Amount of Customers'] == 200000)]["Values"]
+    d =  df.loc[(df['Servers'] == '1 server(s)') & (df['Amount of Customers'] == 300000)]["Values"]
+    plt.legend(loc='upper left')
+    ax1 = sns.displot(data, x="Values", hue="Amount of Customers", kde=True)
+    plt.show()
+
+    print(stats.shapiro(a))
+    print(stats.shapiro(b))
+    print(stats.shapiro(c))
+    print(stats.shapiro(d))
+    print(a)
+
+
+a()
 # rho_measures()
-comparing_servers()
+# comparing_servers()
 # comparing_SJF()
