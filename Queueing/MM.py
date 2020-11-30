@@ -7,20 +7,21 @@ import pandas as pd
 c = 1
 runtime = 100
 # Total number of customers
-NEW_CUSTOMERSS = [50000, 100000, 200000, 300000]
+NEW_CUSTOMERSS = [25000, 50000, 75000, 100000]
 # Generate new customers roughly every x seconds
-job_times = [1,3,6,9]
+job_times = [1, 3, 6, 9]
 
 wait_values = []
 wait_group = []
 customers = []
 
 for NEW_CUSTOMERS in NEW_CUSTOMERSS:
+    print(NEW_CUSTOMERS)
     for job_time in job_times:
         INTERVAL_CUSTOMERS = 10
         all_waits = []
 
-        for _ in range(1000):
+        for _ in range(500):
             waiting = []
             RANDOM_SEED = random.randint(1, 100000000)
 
@@ -61,18 +62,18 @@ for NEW_CUSTOMERS in NEW_CUSTOMERSS:
             env.process(source(env, NEW_CUSTOMERS, INTERVAL_CUSTOMERS/c, counter))
             env.run()
 
-            all_waits.append(round(np.mean(waiting), 2))
+            # all_waits.append(np.mean(waiting))
 
-            wait_values.append(round(np.mean(waiting), 2))
+            wait_values.append(np.mean(waiting))
             wait_group.append(f" Value: {job_time/INTERVAL_CUSTOMERS}")
             customers.append(f"{NEW_CUSTOMERS}")
 
-        plt.hist(all_waits, label=INTERVAL_CUSTOMERS)
+        # plt.hist(all_waits, label=INTERVAL_CUSTOMERS)
 
     data = {'Rho':wait_group, "Values":wait_values, "Amount of Customers":customers}
     df = pd.DataFrame(data) 
     df
-    df.to_csv("MM_values2.csv")
+    df.to_csv("MM_values25k-100k.csv")
 
 # plt.legend()
 # plt.show()

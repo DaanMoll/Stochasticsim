@@ -1,24 +1,35 @@
 import numpy as np
 
 if __name__ == "__main__":
-    rho = 0.90
-    m = 2
-    p0 = 0
+    c = 4
+    rho = 0.95
+    mu = 1
 
-    for k in range(m):
-        p0 += (m*rho)**k / np.math.factorial(k) + (m*rho)**m / np.math.factorial(m) * 1/(1-rho)
- 
-    p0 = 1/p0
+    PI = (c * rho)**c / np.math.factorial(c)
 
-    Mn = m * rho + rho * (((m * rho)**m) / np.math.factorial(m)) * p0/(1-rho)**2
-    print(Mn)
+    summa = 0
+    for n in range(0, c):
+        summa += (c * rho)**n / np.math.factorial(n)
 
-    M1 = rho / (1-rho)
-    print(M1)
+    summa = (1 - rho) * summa + (c * rho)**c / np.math.factorial(c)
+    summa = summa**-1
 
-    El = Mn
-    # lamda 1 is 2x zo laag als lambda van M2
-    Es = El / 2 
-    print(Es)
+    PI = PI * summa
+    print("c:", c)
+    print("delay prob:", PI)
+
+    EW = PI * (1 / (1 - rho)) * 1 / (c*mu)
+
+    print("E(W) =", EW)
+
+    print("deel 2")
+
+    a = 4.5
+    b = 22.5
+
+    c = (0.75 * a) + (0.25 * b)
+    print("c:", c)
+
+
 
     
