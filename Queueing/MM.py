@@ -7,7 +7,7 @@ import pandas as pd
 c = 1
 runtime = 100
 # Total number of customers
-NEW_CUSTOMERSS = [50000, 100000, 200000, 300000]
+NEW_CUSTOMERSS = [25000, 50000, 75000, 100000]
 # Generate new customers roughly every x seconds
 job_times = [1,3,6,9]
 
@@ -20,7 +20,7 @@ for NEW_CUSTOMERS in NEW_CUSTOMERSS:
         INTERVAL_CUSTOMERS = 10
         all_waits = []
 
-        for _ in range(1000):
+        for _ in range(500):
             waiting = []
             RANDOM_SEED = random.randint(1, 100000000)
 
@@ -66,7 +66,8 @@ for NEW_CUSTOMERS in NEW_CUSTOMERSS:
             wait_values.append(round(np.mean(waiting), 2))
             wait_group.append(f" Value: {job_time/INTERVAL_CUSTOMERS}")
             customers.append(f"{NEW_CUSTOMERS}")
-
+            if _%10 == 0:
+                print(f"Simulation: {_}, job time: {job_time}, customers: {NEW_CUSTOMERS}")
         plt.hist(all_waits, label=INTERVAL_CUSTOMERS)
 
     data = {'Rho':wait_group, "Values":wait_values, "Amount of Customers":customers}
