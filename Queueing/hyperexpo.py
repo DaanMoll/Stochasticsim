@@ -5,9 +5,9 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 # Total number of customers
-NEW_CUSTOMERSS = [500000, 100000, 200000, 300000]
+NEW_CUSTOMERSS = [100000]
 # Generate new customers roughly every x seconds
-INTERVAL_CUSTOMERS = 1.8
+INTERVAL_CUSTOMERS = 10
 
 cs = [1, 2, 4]
 c_values = []
@@ -16,7 +16,8 @@ Customer = []
 
 for C in cs:
     for NEW_CUSTOMERS in NEW_CUSTOMERSS: 
-        for _ in range(1000):
+        print("Customers:", NEW_CUSTOMERS)
+        for _ in range(500):
             waiting_time = []
             RANDOM_SEED = random.randint(1, 100000000)
 
@@ -33,9 +34,9 @@ for C in cs:
                 job_time = np.random.uniform(0,1)
 
                 if job_time < 0.25:
-                    jb = random.expovariate(1/5)
+                    jb = random.expovariate(1/22.5)
                 else:
-                    jb = random.expovariate(1)
+                    jb = random.expovariate(1/4.5)
 
                 arrive = env.now
 
@@ -57,12 +58,11 @@ for C in cs:
             env.run()
 
             c_values.append(np.mean(waiting_time))
+            # print("wait", np.mean(waiting_time))
             c_group.append(f"{C} server(s)")
             Customer.append(NEW_CUSTOMERS)
 
 data = {'Servers':c_group, "Values":c_values, "Amount of Customers":Customer}
 df = pd.DataFrame(data) 
 df
-df.to_csv("Longtail_values2.csv")
-
-print("Done")
+# df.to_csv("Longtail_values10.csv")

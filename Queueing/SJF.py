@@ -6,18 +6,17 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 c = 1
-NEW_CUSTOMERSS = [50000, 100000, 200000, 300000] 
+NEW_CUSTOMERSS = [100000] 
 c1 = []
 simmulation = []
 Customer = []
+INTERVAL_CUSTOMERS = 10
+
 for NEW_CUSTOMERS in NEW_CUSTOMERSS:
     runtime = 100
-    for i in range(1000):
+    for i in range(500):
         waiting_time = []
         RANDOM_SEED = random.randint(1, 100000000)
-        # Total number of customers 
-        # Generate new customers roughly every x seconds
-        INTERVAL_CUSTOMERS = 10
 
         def source(env, number, interval, counter):
             """Source generates customers randomly"""
@@ -67,4 +66,4 @@ for NEW_CUSTOMERS in NEW_CUSTOMERSS:
 data = {"Servers":simmulation,"Values":c1, "Amount of customers":Customer}
 df = pd.DataFrame(data) 
 df
-df.to_csv("SJF_values.csv")   
+df.to_csv("SJF_values10.csv")   

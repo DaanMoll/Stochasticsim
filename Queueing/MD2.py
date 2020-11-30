@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-NEW_CUSTOMERSS = [50000, 100000, 200000, 300000]
+NEW_CUSTOMERSS = [100000]
 INTERVAL_CUSTOMERS = 10
 
 c_values = []
@@ -13,9 +13,10 @@ Customers = []
 cs = [1, 2, 4]
 
 for C in cs:
-    for NEW_CUSTOMERS in NEW_CUSTOMERSS:    
+    for NEW_CUSTOMERS in NEW_CUSTOMERSS: 
+        print(NEW_CUSTOMERS)   
         all_waits = []
-        for _ in range(1000):
+        for _ in range(500):
             waiting_time = []
             RANDOM_SEED = random.randint(1, 100000000)
 
@@ -64,10 +65,10 @@ for C in cs:
 
         # plt.hist(all_waits, label=C)
 
-data = {'Servers':c_group, "Values":c_values, "Amount of Customers":customers}
+data = {'Servers':c_group, "Values":c_values, "Amount of Customers":Customers}
 df = pd.DataFrame(data) 
 df
-df.to_csv("MDC_values2.csv")
+df.to_csv("MDC_values10.csv")
 
 # plt.legend()
 # plt.show()

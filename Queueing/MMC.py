@@ -10,16 +10,16 @@ import simpy
 c_values = []
 c_group = []
 customers = []
-cs = [1,2,4]
-NEW_CUSTOMERS = [50000, 100000, 200000, 300000]
+cs = [1, 2, 4]
+NEW_CUSTOMERSS = [100000]
+INTERVAL_CUSTOMERS = 10 
 
 for C in cs:
-    for amount_customer in NEW_CUSTOMERS:    
-        for _ in range(1000):
+    for NEW_CUSTOMERS in NEW_CUSTOMERSS:  
+        print(amount_customer)  
+        for _ in range(500):
             waiting_time = []
-            RANDOM_SEED = random.randint(1,100000000)
-            NEW_CUSTOMERS = amount_customer
-            INTERVAL_CUSTOMERS = 10 
+            RANDOM_SEED = random.randint(1, 100000000)
 
             def source(env, number, interval, counter):
                 """Source generates customers randomly"""
@@ -63,6 +63,4 @@ for C in cs:
 data = {'Servers':c_group, "Values":c_values, "Amount of Customers":customers}
 df = pd.DataFrame(data) 
 df
-df.to_csv("MMC_values2.csv")
-
-print("Done")
+df.to_csv("MMC_values10.csv")

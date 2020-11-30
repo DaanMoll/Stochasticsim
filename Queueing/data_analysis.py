@@ -18,11 +18,11 @@ def comparing_servers():
 
     ax1 = sns.displot(data, x="Values", hue="Servers", kde=True)
     
-    plt.xlabel("Waiting time")
+    plt.xlabel("Waiting time (s)")
     plt.title(queueing_type)
 
     ax1.savefig(f'images/{queueing_type}_Comp_servers.png')
-    plt.show()
+    # plt.show()
     
     print(stats.shapiro(server_1))
     print(stats.shapiro(servers_2))
@@ -45,12 +45,12 @@ def comparing_servers():
 
     b = sns.boxplot(x="Servers", y="Values", data=data)
     b.set_title(queueing_type)
-    plt.ylabel("Waiting time")
+    plt.ylabel("Waiting time (s)")
 
-    plt.title("Comparing servers")
+    # plt.title("Comparing servers")
     figure = b.get_figure()
-    figure.savefig(f'images/{queueing_type}_Boxplot1_comp.png')
-    plt.show()
+    figure.savefig(f'images/{queueing_type}_Boxplot_comp.png')
+    # plt.show()
     
 def rho_measures():
     data = pd.read_csv(f'{queueing_type}_wait_values.csv') 
@@ -86,9 +86,9 @@ def comparing_SJF():
   
     print("\n", stats.ttest_ind(server_1["Values"],server_SJF["Values"]))
     ax = sns.boxplot(x="Servers", y="Values", data=result)
-    ax.set_title("Longtail")
-    plt.ylabel("Waiting time")
-    plt.title("Comparing SJF to normal")
+    # ax.set_title("Longtail")
+    plt.ylabel("Waiting time (s)")
+    plt.title("M/M/1 with different queueing disciplines")
 
     figure = ax.get_figure()
     figure.savefig(f'images/SJF_Boxplot_comp.png')
@@ -114,7 +114,7 @@ def a():
     print(a)
 
 
-a()
+# a()
 # rho_measures()
-# comparing_servers()
+comparing_servers()
 # comparing_SJF()
