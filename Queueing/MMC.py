@@ -11,15 +11,14 @@ c_values = []
 c_group = []
 customers = []
 cs = [1,2,4]
-NEW_CUSTOMERS = [50000, 100000, 200000, 300000]
+NEW_CUSTOMERSS = [100000]
 
 for C in cs:
-    for amount_customer in NEW_CUSTOMERS:    
-        for _ in range(1000):
+    for NEW_CUSTOMERS in NEW_CUSTOMERSS:    
+        for _ in range(500):
             waiting_time = []
             RANDOM_SEED = random.randint(1,100000000)
-            NEW_CUSTOMERS = amount_customer
-            INTERVAL_CUSTOMERS = 10 
+            INTERVAL_CUSTOMERS = 10
 
             def source(env, number, interval, counter):
                 """Source generates customers randomly"""
@@ -56,10 +55,11 @@ for C in cs:
             env.process(source(env, NEW_CUSTOMERS, INTERVAL_CUSTOMERS/C, counter))
             env.run()
 
-            customers.append(f"{amount_customer}")
+            customers.append(f"{NEW_CUSTOMERS}")
             c_values.append(np.mean(waiting_time))
             c_group.append(f"{C} server(s)")
-    
+            if _%10 ==0:
+                print(f"servers: {C}, simulation: {_}, customers: {NEW_CUSTOMERS}")
 data = {'Servers':c_group, "Values":c_values, "Amount of Customers":customers}
 df = pd.DataFrame(data) 
 df

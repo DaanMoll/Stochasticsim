@@ -64,7 +64,7 @@ for C in cs:
 
         # plt.hist(all_waits, label=C)
 
-data = {'Servers':c_group, "Values":c_values, "Amount of Customers":customers}
+data = {'Servers':c_group, "Values":c_values, "Amount of Customers":Customers}
 df = pd.DataFrame(data) 
 df
 df.to_csv("MDC_values2.csv")

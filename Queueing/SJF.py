@@ -6,13 +6,13 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 c = 1
-NEW_CUSTOMERSS = [50000, 100000, 200000, 300000] 
+NEW_CUSTOMERSS = [100000] 
 c1 = []
 simmulation = []
 Customer = []
 for NEW_CUSTOMERS in NEW_CUSTOMERSS:
-    runtime = 100
-    for i in range(1000):
+    # runtime = 100
+    for i in range(500):
         waiting_time = []
         RANDOM_SEED = random.randint(1, 100000000)
         # Total number of customers 
@@ -58,7 +58,7 @@ for NEW_CUSTOMERS in NEW_CUSTOMERSS:
         # Start processes and run
         counter = simpy.resources.resource.PriorityResource(env, capacity=c)
         env.process(source(env, NEW_CUSTOMERS, INTERVAL_CUSTOMERS/c, counter))
-        env.run(runtime)
+        env.run()
 
         simmulation.append("SJF")
         c1.append(np.mean(waiting_time))
@@ -67,4 +67,4 @@ for NEW_CUSTOMERS in NEW_CUSTOMERSS:
 data = {"Servers":simmulation,"Values":c1, "Amount of customers":Customer}
 df = pd.DataFrame(data) 
 df
-df.to_csv("SJF_values.csv")   
+df.to_csv("SJF_values2.csv")   
