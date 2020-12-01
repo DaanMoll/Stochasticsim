@@ -1,7 +1,7 @@
 import numpy as np
 
-if __name__ == "__main__":
-    c = 4
+def expected_waiting_time(c):
+    "Calculate expected waiting time with c amount of workers"
     rho = 0.95
     mu = 1
 
@@ -22,13 +22,8 @@ if __name__ == "__main__":
 
     print("E(W) =", EW)
 
-    print("deel 2")
-
-    a = 4.5
-    b = 22.5
-
-    c = (0.75 * a) + (0.25 * b)
-    print("c:", c)
+if __name__ == "__main__":
+    expected_waiting_time(4)
 
 
 
