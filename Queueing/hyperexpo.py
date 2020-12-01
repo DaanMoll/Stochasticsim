@@ -65,4 +65,4 @@ for C in cs:
 data = {'Servers':c_group, "Values":c_values, "Amount of Customers":Customer}
 df = pd.DataFrame(data) 
 df
-# df.to_csv("Longtail_values10.csv")
+df.to_csv("Longtail_values10.csv")
