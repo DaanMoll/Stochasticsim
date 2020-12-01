@@ -13,7 +13,6 @@ Customer = []
 INTERVAL_CUSTOMERS = 10
 
 for NEW_CUSTOMERS in NEW_CUSTOMERSS:
-    runtime = 100
     for i in range(500):
         waiting_time = []
         RANDOM_SEED = random.randint(1, 100000000)
@@ -57,7 +56,7 @@ for NEW_CUSTOMERS in NEW_CUSTOMERSS:
         # Start processes and run
         counter = simpy.resources.resource.PriorityResource(env, capacity=c)
         env.process(source(env, NEW_CUSTOMERS, INTERVAL_CUSTOMERS/c, counter))
-        env.run(runtime)
+        env.run()
 
         simmulation.append("SJF")
         c1.append(np.mean(waiting_time))
@@ -66,4 +65,8 @@ for NEW_CUSTOMERS in NEW_CUSTOMERSS:
 data = {"Servers":simmulation,"Values":c1, "Amount of customers":Customer}
 df = pd.DataFrame(data) 
 df
+<<<<<<< HEAD
 df.to_csv("SJF_values10.csv")   
+=======
+df.to_csv("SJF_values2.csv")   
+>>>>>>> aa704b4bdae55a1960de65cee699ab9e77633c54

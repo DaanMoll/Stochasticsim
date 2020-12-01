@@ -67,8 +67,9 @@ for NEW_CUSTOMERS in NEW_CUSTOMERSS:
             wait_values.append(np.mean(waiting))
             wait_group.append(f" Value: {job_time/INTERVAL_CUSTOMERS}")
             customers.append(f"{NEW_CUSTOMERS}")
-
-        # plt.hist(all_waits, label=INTERVAL_CUSTOMERS)
+            if _%10 == 0:
+                print(f"Simulation: {_}, job time: {job_time}, customers: {NEW_CUSTOMERS}")
+        plt.hist(all_waits, label=INTERVAL_CUSTOMERS)
 
     data = {'Rho':wait_group, "Values":wait_values, "Amount of Customers":customers}
     df = pd.DataFrame(data) 
