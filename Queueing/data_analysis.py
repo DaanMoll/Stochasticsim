@@ -11,14 +11,13 @@ plt.style.use('ggplot')
 queueing_type = "MDC"
 
 def comparing_servers():
-    data = pd.read_csv(f'{queueing_type}_values2.csv') 
+    data = pd.read_csv(f'{queueing_type}_values.csv') 
     df = pd.DataFrame(data) 
 
     server_1 =  df.loc[(df['Servers'] == '1 server(s)') & (df['Amount of customers'] == 100000)]
     servers_2 =  df.loc[(df['Servers'] == '2 server(s)') & (df['Amount of customers'] == 100000)]
     servers_4 =  df.loc[(df['Servers'] == '4 server(s)') & (df['Amount of customers'] == 100000)]
 
-    print(server_1)
     frames = [server_1, servers_2, servers_4]
     result = pd.concat(frames)
     
@@ -37,26 +36,10 @@ def comparing_servers():
   
     # plt.show()
 
-    print("\n")
-    fvalue, pvalue = stats.f_oneway(server_1["Values"], servers_2["Values"], servers_4["Values"])
-
-    # p value lager dan 0.05 dus significant verschil tussen de 3
-    print(fvalue, pvalue)
-
-    Post_hoc = sp.posthoc_ttest(df, val_col='Values', group_col='Servers', p_adjust='holm')
-
-    print(Post_hoc)
-
     # print(stats.ttest_ind(server_1["Values"], servers_2["Values"], equal_var = True))
     # print(stats.ttest_ind(server_1["Values"], servers_4["Values"], equal_var = True))
     # print(stats.ttest_ind(server_2["Values"], servers_4["Values"], equal_var = True))
 
-
-
-    # Kruskal analysis, not normal distributed
-    # print("\n", stats.kruskal(server_1["Values"], servers_2["Values"], servers_4["Values"]))
-    # Post_hoc_con = sp.posthoc_conover(df, val_col='Values', group_col='Servers', p_adjust='holm')
-    # print(Post_hoc_con)
     sns.set(font_scale=1.25)
     b = sns.boxplot(x="Servers", y="Values", data=data)
     b.set_title(queueing_type)
@@ -74,8 +57,7 @@ def rho_measures():
     be compared with eachother based on different measurements.
     Furthermore a histogram is plotted gor rho = 0.9 
     """
-    queueing_type = "MM_values2"
-    data = pd.read_csv(f'{queueing_type}.csv') 
+    data = pd.read_csv(f'MM_values.csv') 
     df = pd.DataFrame(data)
 
     # Initializing variables
@@ -91,10 +73,8 @@ def rho_measures():
     # Puts all the stanard deviations into the dictionary and plots them
     for a in Rhos: 
         for value in values:
-            print(a)
             rho =  df.loc[(df['Rho'] == f' Value: {a}') & (df['Amount of customers'] == value)]["Values"]
             std_rho = np.std(rho)
-            print(dicti[a])
             dicti[a].append(std_rho)
 
         dicti[a] = scipy.interpolate.make_interp_spline(values, dicti[a])
@@ -117,13 +97,6 @@ def rho_measures():
     c =  df.loc[(df['Rho'] ==  ' Value: 0.9') & (df['Amount of customers'] == 75000)]
     d =  df.loc[(df['Rho'] ==  ' Value: 0.9') & (df['Amount of customers'] == 100000)]
 
-    print(stats.shapiro(a["Values"]))
-    
-    print(stats.shapiro(b["Values"]))
-    
-    print(stats.shapiro(c["Values"]))
-    
-    print(stats.shapiro(d["Values"]))
     # Makes new frame for rho == 0.9
     frames = [a, b, c, d]
     result = pd.concat(frames)
@@ -144,13 +117,13 @@ def rho_measures():
 
 
 def comparing_SJF():
-    data = pd.read_csv('MMC_values2.csv') 
+    data = pd.read_csv('MMC_values.csv') 
     df = pd.DataFrame(data) 
 
-    data1 = pd.read_csv('SJF_values2.csv')
+    data1 = pd.read_csv('SJF_values.csv')
     df1 = pd.DataFrame(data1) 
 
-    server_1 =df.loc[(df['Servers'] == 'FIFO') & (df['Amount of customers'] == 100000)]
+    server_1 =df.loc[(df['Servers'] == '1 server(s)') & (df['Amount of customers'] == 100000)]
     server_SJF = df1.loc[df1["Servers"] =='SJF']
 
     frames = [server_1, server_SJF]
