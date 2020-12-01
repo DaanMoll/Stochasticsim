@@ -25,10 +25,15 @@ def comparing_servers():
     print(stats.shapiro(server_1["Values"]))
     print(stats.shapiro(servers_2["Values"]))
     print(stats.shapiro(servers_4["Values"]))
-
-    ax = sns.displot(result, x="Values", hue="Servers", kde=True)
-    plt.title(f"{queueing_type} distributions for different servers")
-    ax.savefig(f'images/{queueing_type}_Distributions.png')
+    sns.set(font_scale=1.25)
+    ax = sns.histplot(result, x="Values", hue="Servers", kde=True)
+    
+    plt.title("M/D/C distributions for different servers")
+    plt.xlabel("Mean waiting time")
+        
+    figure = ax.get_figure()
+    
+    figure.savefig(f'images/{queueing_type}_Distributions.png', bbox_inches='tight' )
   
     # plt.show()
 
@@ -42,16 +47,23 @@ def comparing_servers():
 
     print(Post_hoc)
 
-    # Kruskal analysis, not normal distributed
-    print("\n", stats.kruskal(server_1["Values"], servers_2["Values"], servers_4["Values"]))
-    Post_hoc_con = sp.posthoc_conover(df, val_col='Values', group_col='Servers', p_adjust='holm')
-    print(Post_hoc_con)
+    # print(stats.ttest_ind(server_1["Values"], servers_2["Values"], equal_var = True))
+    # print(stats.ttest_ind(server_1["Values"], servers_4["Values"], equal_var = True))
+    # print(stats.ttest_ind(server_2["Values"], servers_4["Values"], equal_var = True))
 
+
+
+    # Kruskal analysis, not normal distributed
+    # print("\n", stats.kruskal(server_1["Values"], servers_2["Values"], servers_4["Values"]))
+    # Post_hoc_con = sp.posthoc_conover(df, val_col='Values', group_col='Servers', p_adjust='holm')
+    # print(Post_hoc_con)
+    sns.set(font_scale=1.25)
     b = sns.boxplot(x="Servers", y="Values", data=data)
     b.set_title(queueing_type)
     plt.ylabel("Waiting time")
+    plt.xlabel(" ")
 
-    plt.title("Comparing M/M/C queues")
+    plt.title("Comparing M/D/C queues")
     figure = b.get_figure()
     figure.savefig(f'images/{queueing_type}1_Boxplot_comp.png')
     # plt.show()
@@ -88,13 +100,15 @@ def rho_measures():
         dicti[a] = scipy.interpolate.make_interp_spline(values, dicti[a])
         dicti[a] = dicti[a](x)
         plt.semilogy(x, dicti[a], label=f"\u03C1 = {a}")
-        plt.legend()
+        plt.legend(fontsize=12)
 
-    plt.xlabel("Measurements")
+    plt.xlabel("Measurements", fontsize=14)
+   
     plt.xticks(values)
-    plt.ylabel("Standard deviation")
-    plt.title("Standard deviations for different measures")
-    # plt.savefig('various_rho.png')
+    plt.ylabel("Standard deviation", fontsize=14)
+    plt.title("Standard deviations for different measures", fontsize=16)
+    plt.savefig('various_rho.png')
+
     plt.show()
 
     # Takes all the data for Rho == 0.9
@@ -114,10 +128,18 @@ def rho_measures():
     frames = [a, b, c, d]
     result = pd.concat(frames)
     
+    sns.set(font_scale=1.25)
+    
     # Plots histogram for rho == 0.9
-    ax1 = sns.displot(result, x="Values", hue="Amount of customers", kde=True)
+    a = sns.histplot(result, x="Values", hue="Amount of customers", kde=True)
+    
     plt.title("Distributions for \u03C1 = 0.9")
-    ax1.savefig(f'images/rho=0.9_Distributions.png')
+    
+    plt.xlabel("Mean waiting time")
+    # savefig(f'images/rho=0.9_Distributions.png')
+    
+    figure = a.get_figure()
+    figure.savefig(f'images/rho=0.9_Distributions.png', bbox_inches='tight')
     plt.show()
 
 
@@ -134,22 +156,27 @@ def comparing_SJF():
     frames = [server_1, server_SJF]
     result = pd.concat(frames)
 
-    print(server_1)
+
     print(stats.shapiro(server_1["Values"]))
     print(stats.shapiro(server_SJF["Values"]))
+    print(np.mean(server_1["Values"]))
+    print(np.std(server_1["Values"]))
+    print(np.mean(server_SJF["Values"]))
+    print(np.std(server_SJF["Values"]))
+
     print("\n", stats.ttest_ind(server_1["Values"],server_SJF["Values"]))
+    sns.set(font_scale=1.25)
     ax = sns.boxplot(x="Servers", y="Values", data=result)
     # ax.set_title("Longtail")
     plt.xlabel("")
     plt.ylabel("Waiting time")
-    plt.title("M/M/1 with different queueing disciplines")
+    plt.xlabel(" ")
+    
+    plt.title("Comparing SJF to FIFO ")
 
     figure = ax.get_figure()
     figure.savefig(f'images/SJF_Boxplot_comp.png')
     plt.show()
-
-
-
 
 # a()
 # rho_measures()
