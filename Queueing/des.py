@@ -1,27 +1,30 @@
 import numpy as np
 
-if __name__ == "__main__":
-    rho = 0.90
-    m = 2
-    p0 = 0
+def expected_waiting_time(c):
+    "Calculate expected waiting time with c amount of workers"
+    rho = 0.95
     mu = 1
 
-    for k in range(m):
-        p0 += (m*rho)**k / np.math.factorial(k) + (m*rho)**m / np.math.factorial(m) * 1/(1-rho)
- 
-    p0 = 1/p0
-    print(p0)
-    Mn = m * rho + rho * (((m * rho)**m) / np.math.factorial(m)) * p0/(1-rho)**2
-    # print(Mn)
+    PI = (c * rho)**c / np.math.factorial(c)
 
-    M1 = rho / (1-rho)
-    # print(M1)
+    summa = 0
+    for n in range(0, c):
+        summa += (c * rho)**n / np.math.factorial(n)
 
-    El = Mn
-    # lamda 1 is 2x zo laag als lambda van M2
-    Es = El / 2 
+    summa = (1 - rho) * summa + (c * rho)**c / np.math.factorial(c)
+    summa = summa**-1
 
-    print(p0*(1/1-rho) * 0.5)
-    print(Es)
+    PI = PI * summa
+    print("c:", c)
+    print("delay prob:", PI)
+
+    EW = PI * (1 / (1 - rho)) * 1 / (c*mu)
+
+    print("E(W) =", EW)
+
+if __name__ == "__main__":
+    expected_waiting_time(4)
+
+
 
     
