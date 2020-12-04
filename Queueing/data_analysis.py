@@ -8,7 +8,7 @@ import scipy.interpolate
 from matplotlib import rcParams
 
 plt.style.use('ggplot')
-queueing_type = "MDC"
+queueing_type = "Longtail"
 
 def comparing_servers():
     """
@@ -20,11 +20,34 @@ def comparing_servers():
     # Importing data
     data = pd.read_csv(f'{queueing_type}_values.csv') 
     df = pd.DataFrame(data) 
+    data1 = pd.read_csv(f'Waiting_data/MMC_values2.csv') 
+    df1 =  pd.DataFrame(data1)
+    data2 = pd.read_csv(f'Waiting_data/MDC_values2.csv') 
+    df2 =  pd.DataFrame(data2)
 
-    # Rearange data
-    server_1 =  df.loc[(df['Servers'] == '1 server(s)') & (df['Amount of customers'] == 100000)]
-    servers_2 =  df.loc[(df['Servers'] == '2 server(s)') & (df['Amount of customers'] == 100000)]
-    servers_4 =  df.loc[(df['Servers'] == '4 server(s)') & (df['Amount of customers'] == 100000)]
+    server_1a =  df.loc[(df['Servers'] == '1 server(s)') & (df['Amount of customers'] == 100000)]
+    servers_2a =  df.loc[(df['Servers'] == '2 server(s)') & (df['Amount of customers'] == 100000)]
+    servers_4a =  df.loc[(df['Servers'] == '4 server(s)') & (df['Amount of customers'] == 100000)]
+    server_1b =  df1.loc[(df1['Servers'] == '1 server(s)') & (df1['Amount of customers'] == 100000)]
+    servers_2b =  df1.loc[(df1['Servers'] == '2 server(s)') & (df1['Amount of customers'] == 100000)]
+    servers_4b =  df1.loc[(df1['Servers'] == '4 server(s)') & (df1['Amount of customers'] == 100000)]
+    server_1c =  df2.loc[(df2['Servers'] == '1 server(s)') & (df2['Amount of customers'] == 100000)]
+    servers_2c =  df2.loc[(df2['Servers'] == '2 server(s)') & (df2['Amount of customers'] == 100000)]
+    servers_4c =  df2.loc[(df2['Servers'] == '4 server(s)') & (df2['Amount of customers'] == 100000)]
+    
+    l_a = [server_1a, servers_2a, servers_4a]
+    l_b = [server_1b, servers_2b, servers_4b]
+    l_c = [server_1c, servers_2c, servers_4c]
+    
+    counter = 0
+    for a in l_a:
+        for b in l_b:
+            for c in l_c:
+                counter +=1
+                print(stats.ttest_ind(a["Values"], b["Values"], equal_var = True))
+                print(stats.ttest_ind(b["Values"], c["Values"], equal_var = True))
+                print(stats.ttest_ind(a["Values"], c["Values"], equal_var = True))
+                print("\n",counter,"\n")
 
     # Compresses data
     frames = [server_1, servers_2, servers_4]
@@ -39,18 +62,23 @@ def comparing_servers():
     sns.set(font_scale=1.25)
     ax = sns.histplot(result, x="Values", hue="Servers", kde=True)
     
-    plt.title("M/D/C distributions for different servers")
-    plt.xlabel("Mean waiting time")
-        
-    figure = ax.get_figure()
+    # plt.title("M/M/C distributions for different servers")
+    # plt.xlabel("Mean waiting time")
+    # print(np.mean(server_1["Values"]))
+    # print(np.std(server_1["Values"]))
+    # print(np.mean(servers_2["Values"]))
+    # print(np.std(servers_2["Values"]))
+    # print(np.mean(servers_4["Values"]))
+    # print(np.std(servers_4["Values"]))
+    # figure = ax.get_figure()
     
-    figure.savefig(f'images/{queueing_type}_Distributions.png', bbox_inches='tight' )
+    # figure.savefig(f'images/{queueing_type}_Distributions.png', bbox_inches='tight' )
   
     # plt.show()
 
-    # print(stats.ttest_ind(server_1["Values"], servers_2["Values"], equal_var = True))
-    # print(stats.ttest_ind(server_1["Values"], servers_4["Values"], equal_var = True))
-    # print(stats.ttest_ind(server_2["Values"], servers_4["Values"], equal_var = True))
+    # # print(stats.ttest_ind(server_1["Values"], servers_2["Values"], equal_var = True))
+    # # print(stats.ttest_ind(server_1["Values"], servers_4["Values"], equal_var = True))
+    # # print(stats.ttest_ind(server_2["Values"], servers_4["Values"], equal_var = True))
 
     sns.set(font_scale=1.25)
     b = sns.boxplot(x="Servers", y="Values", data=data)
@@ -97,8 +125,8 @@ def rho_measures():
     plt.xlabel("Measurements", fontsize=14)
    
     plt.xticks(values)
-    plt.ylabel("Standard deviation", fontsize=14)
-    plt.title("Standard deviations for different measures", fontsize=16)
+    plt.ylabel("Std of Average waiting time", fontsize=14)
+    plt.title("Comparison of different \u03C1 value", fontsize=16)
     plt.savefig('various_rho.png')
 
     plt.show()
