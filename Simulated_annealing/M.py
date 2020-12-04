@@ -1,50 +1,69 @@
 import matplotlib.pyplot as plt 
 import numpy as np
+from Making_connections import making_connections
+from Optimalization import optimalization, optimalization1
 
 # Choose TSP file
 file_ = "eil51.tsp.txt"
 
 # Initializes lists and dictionaries
-cities = {}
-x_coordinates = []
-y_coordinates = []
 connections = []
-total_distance = []
 total_cities = []
 
-# Reads from data file and plots and saves all coordinates from cities
-with open(f'TSP_data\{file_}', 'r') as reader:
-    counter = 1
-    for line in reader:
-        if line[0].isdigit():
-            new_line = line.split()
-            plt.plot(int(new_line[1]), int(new_line[2]), '.')
-            cities[counter] = (int(new_line[1]), int(new_line[2]))
-            counter+=1
 
-# Makes initial random connections between cities
-# Checks the distances between cities and save them
-while len(connections) != counter - 1:
-    city1 = np.random.randint(1,counter)
-    city2 = np.random.randint(1,counter)
-    while city1 == city2:
-        city2 = np.random.randint(1,counter)
+def plot_cities():
+    """
+    Reads from data file and plots and saves
+    all coordinates from cities. Returns amount of cities
+    and the cities with coordinates.
+    """
 
-    city1 = cities[city1]
-    city2 = cities[city2]
+    # Initialize cities
+    cities = {}
 
-    if (city1, city2) in connections or total_cities.count(city1) == 2 or total_cities.count(city2) ==2:
-        continue
-    distance = np.sqrt((city2[0] - city1[0])**2 + (city2[1] - city1[1])**2)
-    print(city1, city2)
-    print(len(connections))
-    connections.append((city1, city2))
-    total_distance.append(distance)
-    total_cities.append(city1)
-    total_cities.append(city2)
-    plt.plot([city1[0],city2[0]], [city1[1],city2[1]])
+    # Opens file, reads lines, saves cities and makes a plot of the cities
+    with open(f'TSP_data\{file_}', 'r') as reader:
+        city_count = 1
+        for line in reader:
+            if line[0].isdigit():
+                new_line = line.split()
+                plt.plot(int(new_line[1]), int(new_line[2]), '.')
+                cities[city_count] = (int(new_line[1]), int(new_line[2]))
+                city_count+=1
+    return city_count, cities
+
+# Make values
+city_count = plot_cities()[0]
+cities = plot_cities()[1]
+
+# Makes connections between the initial points
+values = making_connections(cities, connections, total_cities, city_count)
+
+# Returnes values of the connection fuction
+total_distance = values[0]
+connections = values[1]
+total_cities = values[2]
 
 # Shows the connections and total distance
-print(np.sum(total_distance))
+plt.show()
+print(total_distance)
+
+# Choose the iterations of simulation
+iterations = 100
+new_lines = 10
+
+# Optimizes the route of TSP
+connections = optimalization(total_distance, connections, total_cities,city_count, iterations, new_lines, cities)
+
+plt.close()
+
+# Makes a plot of the new, shortest, route
+plot_cities()
+for con in connections[0]:
+    plt.plot([con[0][0], con[1][0]],[con[0][1], con[1][1]])
 plt.show()
 
+x = np.linspace(0, (iterations-1), iterations)
+
+plt.plot(x, connections[1])
+plt.show()
