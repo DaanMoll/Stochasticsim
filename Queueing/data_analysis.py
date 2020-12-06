@@ -11,6 +11,13 @@ plt.style.use('ggplot')
 queueing_type = "Longtail"
 
 def comparing_servers():
+    """
+    This function compares a queueing node with a varying amount of servers
+    It prints the p-value of the shapiro test, and the p-values of welchs t-test
+    It furthermore returns a histogram of the distributions and a boxplot
+    """
+
+    # Importing data
     data = pd.read_csv(f'{queueing_type}_values.csv') 
     df = pd.DataFrame(data) 
     data1 = pd.read_csv(f'Waiting_data/MMC_values2.csv') 
@@ -42,14 +49,18 @@ def comparing_servers():
                 print(stats.ttest_ind(a["Values"], c["Values"], equal_var = True))
                 print("\n",counter,"\n")
 
+    # Compresses data
     frames = [server_1, servers_2, servers_4]
     result = pd.concat(frames)
     
-    # print(stats.shapiro(server_1["Values"]))
-    # print(stats.shapiro(servers_2["Values"]))
-    # print(stats.shapiro(servers_4["Values"]))
-    # sns.set(font_scale=1.25)
-    # ax = sns.histplot(result, x="Values", hue="Servers", kde=True)
+    # Prints statistical properties
+    print(stats.shapiro(server_1["Values"]))
+    print(stats.shapiro(servers_2["Values"]))
+    print(stats.shapiro(servers_4["Values"]))
+
+    # Shows boxplot and histogram and saves both
+    sns.set(font_scale=1.25)
+    ax = sns.histplot(result, x="Values", hue="Servers", kde=True)
     
     # plt.title("M/M/C distributions for different servers")
     # plt.xlabel("Mean waiting time")
@@ -146,6 +157,13 @@ def rho_measures():
 
 
 def comparing_SJF():
+    """
+    This function compares a M/M/1 queuing node with FIFO discipline with a SJF discipline
+    It plots a box plot of both queues and prints both means, std and the p-value of the
+    shapiro wilks test
+    """
+
+    # Imports data
     data = pd.read_csv('MMC_values.csv') 
     df = pd.DataFrame(data) 
 
@@ -155,21 +173,22 @@ def comparing_SJF():
     server_1 =df.loc[(df['Servers'] == '1 server(s)') & (df['Amount of customers'] == 100000)]
     server_SJF = df1.loc[df1["Servers"] =='SJF']
 
+    # Makes one frame of both data files
     frames = [server_1, server_SJF]
     result = pd.concat(frames)
 
-
+    # Prints statistical properties of both groups
     print(stats.shapiro(server_1["Values"]))
     print(stats.shapiro(server_SJF["Values"]))
     print(np.mean(server_1["Values"]))
     print(np.std(server_1["Values"]))
     print(np.mean(server_SJF["Values"]))
     print(np.std(server_SJF["Values"]))
-
     print("\n", stats.ttest_ind(server_1["Values"],server_SJF["Values"]))
     sns.set(font_scale=1.25)
+
+    # Plots boxplot
     ax = sns.boxplot(x="Servers", y="Values", data=result)
-    # ax.set_title("Longtail")
     plt.xlabel("")
     plt.ylabel("Waiting time")
     plt.xlabel(" ")
@@ -180,7 +199,7 @@ def comparing_SJF():
     figure.savefig(f'images/SJF_Boxplot_comp.png')
     plt.show()
 
-# a()
+
 # rho_measures()
 # comparing_servers()
 comparing_SJF()
