@@ -2,13 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Making_connections import making_connections
 from Optimalization import optimalization, optimalization1
-
+from operator import itemgetter
 # Choose TSP file
 file_ = "eil51.tsp.txt"
-
-# Initializes lists and dictionaries
-connections = []
-total_cities = []
 
 
 def plot_cities():
@@ -33,27 +29,40 @@ def plot_cities():
     return city_count, cities
 
 # Make values
-city_count = plot_cities()[0]
-cities = plot_cities()[1]
+values = 0
 
-# Makes connections between the initial points
-values = making_connections(cities, connections, total_cities, city_count)
+while values == 0: 
+
+    # Initializes lists and dictionaries
+    connections = []
+    total_cities = []
+    city_1 =[]
+    city_2 = []
+    city_count = plot_cities()[0]
+    cities = plot_cities()[1]
+
+# Makes connections between the initial points    
+    values = making_connections(cities, connections, city_count, city_1, city_2)
 
 # Returnes values of the connection fuction
 total_distance = values[0]
 connections = values[1]
-total_cities = values[2]
+city_1 =values[2]
+city_2 = values[3]
 
 # Shows the connections and total distance
 plt.show()
 print(total_distance)
 
 # Choose the iterations of simulation
-iterations = 100
+iterations = 5
 new_lines = 10
 
 # Optimizes the route of TSP
-connections = optimalization(total_distance, connections, total_cities,city_count, iterations, new_lines, cities)
+# connections = optimalization(total_distance, connections, total_cities,city_count, iterations, new_lines, cities, city_1, city_2)
+
+print(city_1)
+print(city_2)
 
 plt.close()
 
@@ -61,6 +70,8 @@ plt.close()
 plot_cities()
 for con in connections[0]:
     plt.plot([con[0][0], con[1][0]],[con[0][1], con[1][1]])
+print(total_distance)
+
 plt.show()
 
 x = np.linspace(0, (iterations-1), iterations)
