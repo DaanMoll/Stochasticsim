@@ -1,81 +1,204 @@
 import matplotlib.pyplot as plt 
 import numpy as np
+from operator import itemgetter
+import copy
+import random
 
-# Choose TSP file
-file_ = "eil51.tsp.txt"
+def acceptance_probability(distance, new_distance, temperature):
+    """
+    Calculate probability of accepting new cost
+    """
+    if new_distance < distance:
+        return 1
+    else:
+        p = np.exp(- (new_distance - distance) / temperature)
+        return p
 
-# Initializes lists and dictionaries
-cities = {}
-x_coordinates = []
-y_coordinates = []
-connections = []
-total_distance = []
-total_cities = []
+def simulated_annealing(distance, connections):
+    start_temp = 2000
+    original_distance = distance
+    current_distance = distance
+    best_distance = distance
 
-# Reads from data file and plots and saves all coordinates from cities
-with open(f'TSP_data/{file_}', 'r') as reader:
-    counter = 0
-    for line in reader:
-        if line[0].isdigit():
-            counter+=1
-            new_line = line.split()
-            # print(new_line)
-            plt.plot(int(new_line[1]), int(new_line[2]), '.')
-            cities[counter] = (int(new_line[1]), int(new_line[2]))
+    best_connections = copy.deepcopy(connections)
+
+    replace_cities = []
+    replace_connections = 1
+    max_iterations = 1
+
+    for iteration in range(max_iterations):
+        backup_connections = copy.deepcopy(connections)
+
+        distance_order = sorted(connections, key=itemgetter(2), reverse=True)
+
+        for _ in range(replace_connections):
+            replace_cities.append(distance_order[0][0])
+            replace_cities.append(distance_order[0][1])
+
+            connections.remove(distance_order[0])
+            distance_order.pop(0)
+
+            random_city = random.choice(distance_order)
+            replace_cities.append(random_city[0])
+            replace_cities.append(random_city[1])
+            connections.remove(random_city)
+            distance_order.remove(random_city)
+
+        while len(replace_cities) != 0:
+            number_1 = np.random.choice(replace_cities)
+
+            for city in replace_cities:
+                if replace_cities.count(city) == 2:
+                    number_1 = city
+                    break
+
+            lowest_distance = 999999
+            replace_cities.remove(number_1)
+            for number in replace_cities:
+                if number == number_1:
+                    continue
+
+                city1 = cities[number_1]
+                city2 = cities[number]
+
+                distance = np.sqrt((city2[0] - city1[0])**2 + (city2[1] - city1[1])**2)
+
+                if distance < lowest_distance:
+                    lowest_distance = distance
+                    number_2 = number
             
+            if lowest_distance == 999999:
+                continue
 
-# Makes initial random connections between cities
-# Checks the distances between cities and save them
-city_numbers = [i for i in range(1, 51, 1)]
+            replace_cities.remove(number_2)
+            connections.append((number_1, number_2, distance))
 
-while len(connections) != counter - 1:
-    np.random.shuffle(city_numbers)
-    number_1 = city_numbers[0]
+        new_distance = 0
+        for connection in connections:
+            new_distance += float(connection[2])
+
+
+        # check if new solution is correct
+        print(connections, len(connections))
+        position = connections[0]
+        check_connections = copy.deepcopy(connections)
+        new_connections = copy.deepcopy(connections)
+
+        while check_connections.count(position) > 0:
+            next_position = position[1]
+            print(next_position)
+            
+            check_connections.remove(position)
+            for connection in check_connections:
+                if next_position in connection:
+                    position = connection
+        
+        if len(check_connections) > 1:
+            print("FOUTE SOL \n", check_connections, len(check_connections))
+            connection = backup_connections
+            continue
+            
+        print("eind len conn", len(connections))
+        print("current distance:", current_distance)
+        print("new distance:", new_distance)
+        
+        if new_distance < current_distance:
+            current_distance = new_distance
+        else:
+            current_temp = start_temp - (start_temp/max_iterations) * iteration
+            ap = acceptance_probability(current_distance, new_distance, current_temp)
+            if random.uniform(0, 1) < ap:
+                current_distance = new_distance
+            else:
+                backup_connections = copy.deepcopy(connections)
+
+        if current_distance < best_distance:
+            best_distance = current_distance
+            best_connections = copy.deepcopy(connections)
+
+    print("started with:", original_distance)
+    print("best found:", best_distance)
+    print("current:", current_distance)
+    print("last:", new_distance)
+
+    # LET OP BEST CONNECTIONS OWRDT GEPLOT!!!!!!!!!!!!!!!!!!!
+    for connection in new_connections:
+            plt.plot([cities[connection[0]][0], cities[connection[1]][0]], [cities[connection[0]][1], cities[connection[1]][1]])
+    
+    plt.show()
+
+
+if __name__ == "__main__":
+    # Choose TSP file
+    file_ = "eil51.tsp.txt"
+
+    # Initializes lists and dictionaries
+    cities = {}
+    connections = []
+    total_distance = []
+    order = []
+
+    # Reads from data file and plots and saves all coordinates from cities
+    with open(f'TSP_data/{file_}', 'r') as reader:
+        counter = 0
+        for line in reader:
+            if line[0].isdigit():
+                counter+=1
+                new_line = line.split()
+                # print(new_line)
+                plt.plot(int(new_line[1]), int(new_line[2]), '.')
+                cities[counter] = (int(new_line[1]), int(new_line[2]))
+                
+
+    # Makes initial random connections between cities
+    # Checks the distances between cities and save them
+    city_numbers = [i for i in range(1, counter+1, 1)]
+
+    number_1 = np.random.choice(city_numbers)
+    first_city = number_1
+
+    order.append(first_city)
+
+    city_numbers.remove(number_1)
+
+    while len(city_numbers) != 0:
+        city1 = cities[number_1]
+        
+        lowest_distance = 999999
+
+        for number in city_numbers:
+            # if number_1 == number:
+            #     continue
+
+            city2 = cities[number]
+
+            distance = np.sqrt((city2[0] - city1[0])**2 + (city2[1] - city1[1])**2)
+            
+            if distance < lowest_distance:
+                lowest_distance = distance
+                number_2 = number
+                
+        if lowest_distance == 999999:
+            continue
+
+        connections.append((number_1, number_2, lowest_distance))
+        order.append(number_2)
+        city_numbers.remove(number_2)
+        total_distance.append(lowest_distance)
+        number_1 = number_2
 
     city1 = cities[number_1]
-    lowest_distance = 999999
+    city2 = cities[first_city]
 
-    for number in city_numbers:
-        if number_1 == number:
-            continue
+    distance = np.sqrt((city2[0] - city1[0])**2 + (city2[1] - city1[1])**2)
 
-        city2 = cities[number]
+    connections.append((number_1, first_city, distance))
+    order.append(first_city)
+    total_distance.append(distance)
 
-        if (city1, city2) in connections or total_cities.count(city1) == 2 or total_cities.count(city2) == 2:
-            continue
+    print(len(connections))
+    print("Sum before sa:", np.sum(total_distance))
 
-        distance = np.sqrt((city2[0] - city1[0])**2 + (city2[1] - city1[1])**2)
-        
-        if distance < lowest_distance:
-            lowest_distance = distance
-            number_2 = number
+    simulated_annealing(np.sum(total_distance), connections)
+
     
-    # print(city1, city2)
-    if lowest_distance == 999999:
-        continue
-
-    connections.append((number_1, number_2))
-
-    total_distance.append(lowest_distance)
-
-    total_cities.append(number_1)
-    total_cities.append(number_2)
-
-    if total_cities.count(number_1) == 2:
-        city_numbers.remove(number_1)
-
-    if total_cities.count(number_2) == 2:
-        city_numbers.remove(number_2)
-
-    # plt.plot([city1[0],city2[0]], [city1[1],city2[1]])
-
-# Shows the connections and total distance
-count = [0] * counter
-for connection in connections:
-    count[int(connection[0])] += 1
-    count[int(connection[1])] += 1
-
-print(count[1:counter])
-
-print(np.sum(total_distance))
-# plt.show()
