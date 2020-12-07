@@ -15,16 +15,14 @@ def acceptance_probability(distance, new_distance, temperature):
         return p
 
 def simulated_annealing(distance, connections):
-    start_temp = 2000
-    original_distance = distance
-    current_distance = distance
-    best_distance = distance
+    fout = 0
 
-    best_connections = copy.deepcopy(connections)
+    start_temp = 2000
+    current_distance = distance
 
     replace_cities = []
-    replace_connections = 1
-    max_iterations = 1
+    replace_connections = 5
+    max_iterations = 1000
 
     for iteration in range(max_iterations):
         backup_connections = copy.deepcopy(connections)
@@ -77,30 +75,27 @@ def simulated_annealing(distance, connections):
         for connection in connections:
             new_distance += float(connection[2])
 
-
         # check if new solution is correct
-        print(connections, len(connections))
-        position = connections[0]
         check_connections = copy.deepcopy(connections)
-        new_connections = copy.deepcopy(connections)
+        position = connections[0]
 
         while check_connections.count(position) > 0:
             next_position = position[1]
-            print(next_position)
-            
+
             check_connections.remove(position)
+
             for connection in check_connections:
-                if next_position in connection:
+                if next_position == connection[0]:
                     position = connection
         
         if len(check_connections) > 1:
-            print("FOUTE SOL \n", check_connections, len(check_connections))
-            connection = backup_connections
+            fout += 1
+            connections = backup_connections
             continue
             
-        print("eind len conn", len(connections))
-        print("current distance:", current_distance)
-        print("new distance:", new_distance)
+        # print("eind len conn", len(connections))
+        # print("current distance:", current_distance)
+        # print("new distance:", new_distance)
         
         if new_distance < current_distance:
             current_distance = new_distance
@@ -110,22 +105,15 @@ def simulated_annealing(distance, connections):
             if random.uniform(0, 1) < ap:
                 current_distance = new_distance
             else:
-                backup_connections = copy.deepcopy(connections)
+                connections = backup_connections
 
-        if current_distance < best_distance:
-            best_distance = current_distance
-            best_connections = copy.deepcopy(connections)
-
-    print("started with:", original_distance)
-    print("best found:", best_distance)
     print("current:", current_distance)
-    print("last:", new_distance)
 
-    # LET OP BEST CONNECTIONS OWRDT GEPLOT!!!!!!!!!!!!!!!!!!!
-    for connection in new_connections:
-            plt.plot([cities[connection[0]][0], cities[connection[1]][0]], [cities[connection[0]][1], cities[connection[1]][1]])
+    for connection in connections:
+        plt.plot([cities[connection[0]][0], cities[connection[1]][0]], [cities[connection[0]][1], cities[connection[1]][1]])
     
-    plt.show()
+    print("fout van:", fout, "iterations:", max_iterations)
+    # plt.show()
 
 
 if __name__ == "__main__":
@@ -149,7 +137,6 @@ if __name__ == "__main__":
                 plt.plot(int(new_line[1]), int(new_line[2]), '.')
                 cities[counter] = (int(new_line[1]), int(new_line[2]))
                 
-
     # Makes initial random connections between cities
     # Checks the distances between cities and save them
     city_numbers = [i for i in range(1, counter+1, 1)]
