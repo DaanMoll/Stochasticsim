@@ -27,5 +27,6 @@ if __name__ == '__main__':
     cost_mat += cost_mat.T
     np.fill_diagonal(cost_mat, 0)
     cost_mat = list(cost_mat)
+    
     best_route = two_opt(init_route, cost_mat)
     print(best_route)
