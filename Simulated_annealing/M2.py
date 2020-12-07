@@ -15,6 +15,7 @@ def acceptance_probability(distance, new_distance, temperature):
         # print(p)
         return p
 
+
 def hill_climber(distance, connections):
     distancess = []
     fout = 0
@@ -23,7 +24,7 @@ def hill_climber(distance, connections):
 
     replace_cities = []
     replace_connections = 2
-    max_iterations = 1000
+    max_iterations = 100
 
     while (max_iterations -1) != iteration:
         backup_connections = copy.deepcopy(connections)
@@ -111,12 +112,12 @@ def simulated_annealing(distance, connections):
     distancess = []
     fout = 0
     iteration = 0
-    start_temp = 20
+    start_temp = 10
     current_distance = distance
 
     replace_cities = []
     replace_connections = 2
-    max_iterations = 1000
+    max_iterations = 100
 
     while (max_iterations -1) != iteration:
         backup_connections = copy.deepcopy(connections)
@@ -204,6 +205,77 @@ def simulated_annealing(distance, connections):
 
     return connections, current_distance, distancess
 
+def simulated_annealing_2opt(distance, cities, order):
+    start_temp = 20
+    max_iterations = 100
+    accepted = 0
+    count = 0
+    distances = []
+    current_distance = distance
+    # print(cities)
+    for iteration in range(max_iterations):
+        
+        print(iteration)
+        for i in range(0, len(order) - 2):
+            for j in range(i + 1, len(order)):
+             
+                backup_order = copy.deepcopy(order)
+                connections = []
+                # print(len(order))
+                if j - i == 1: continue
+
+                switch_1 = order[i]
+                index_1 = i
+                switch_2 = order[j]
+                index_2 = j
+                
+                order[index_1] = switch_2
+                order[index_2] = switch_1
+
+                new_order = copy.deepcopy(order)
+                # print(order)
+                first_city = order[0]
+                current_city = order[0]
+                order.pop(0)
+                
+                # print(len(order))
+                while len(order) != 0:
+                    # print(order)
+                    city1 = cities[current_city]
+                    city2 = cities[order[0]]
+                    distance = np.sqrt((city2[0] - city1[0])**2 + (city2[1] - city1[1])**2)
+                    connections.append((current_city, order[0], distance))
+                    current_city = order[0]
+                    order.pop(0)
+
+
+                # hier nog weer lijn naar start city
+                city1 = cities[current_city]
+                city2 = cities[first_city]
+                distance = np.sqrt((city2[0] - city1[0])**2 + (city2[1] - city1[1])**2)
+                connections.append((current_city, first_city, distance))
+
+                new_distance = 0
+                for connection in connections:
+                    new_distance += float(connection[2])
+                # print(new_distance)
+                current_temp = start_temp - (start_temp/max_iterations) * iteration
+                ap = acceptance_probability(current_distance, new_distance, current_temp)
+                if random.uniform(0, 1) < ap:
+                    current_distance = new_distance
+                    order = new_order
+                    accepted += 1
+                    # print("A")
+                else:
+                    order = backup_order
+                    # print("B")
+                distances.append(current_distance)
+                count+=1
+        
+    print("accepted:", accepted)
+    print(current_distance)
+    return connections, current_distance, distances, count
+
 def nearest_neighbour(cities):
     order = []
     connections = []
@@ -246,16 +318,57 @@ def nearest_neighbour(cities):
     distance = np.sqrt((city2[0] - city1[0])**2 + (city2[1] - city1[1])**2)
 
     connections.append((number_1, first_city, distance))
-    order.append(first_city)
     total_distance.append(distance)
 
-    return connections, np.sum(total_distance)
+    return connections, np.sum(total_distance), order
+
+# def opt_order(cities):
+#     order = []
+#     connections = []
+
+#     with open("TSP_data/eil51.opt.tour.txt") as data:
+#         for row in data:
+#             row = row.strip("\n")
+#             print(row)
+#             if row.isdigit():
+#                 order.append(int(row))
+
+#     print(order)
+#     print(len(order))
+
+#     first_city = order[0]
+#     current_city = order[0]
+#     order.pop(0)
+
+#     while len(order) != 0:
+#         city1 = cities[current_city]
+#         city2 = cities[order[0]]
+#         distance = np.sqrt((city2[0] - city1[0])**2 + (city2[1] - city1[1])**2)
+#         connections.append((current_city, order[0], distance))
+#         current_city = order[0]
+#         order.pop(0)
+
+#     # hier nog weer lijn naar start city
+#     city1 = cities[current_city]
+#     city2 = cities[first_city]
+#     distance = np.sqrt((city2[0] - city1[0])**2 + (city2[1] - city1[1])**2)
+#     connections.append((current_city, first_city, distance))
+
+#     new_distance = 0
+#     for connection in connections:
+#         new_distance += float(connection[2])
+
+#     print("opt dist:", new_distance)
+
+#     for connection in connections:
+#         plt.plot([cities[connection[0]][0], cities[connection[1]][0]], [cities[connection[0]][1], cities[connection[1]][1]])
+#     plt.show()
 
 # def 2-opt():
 
 if __name__ == "__main__":
     # Choose TSP file
-    file_ = "eil51.tsp.txt"
+    file_ = "a280.tsp.txt"
 
     # Initializes lists and dictionaries
     cities = {}
@@ -270,36 +383,40 @@ if __name__ == "__main__":
                 # print(new_line)
                 plt.plot(int(new_line[1]), int(new_line[2]), '.')
                 cities[counter] = (int(new_line[1]), int(new_line[2]))
-            
 
     result = nearest_neighbour(cities)
-    connections = result[0]
+    original_connections = result[0]
     start_distance = result[1]
-    print("Sum before sa:", start_distance)
+    order = result[2]
+   
 
-    result = simulated_annealing(np.sum(start_distance), connections)
+    print("Sum before sa:", start_distance)
+    
+    
+    result = simulated_annealing_2opt(np.sum(start_distance), cities, order)
     connections1 = result[0]
     sa_distance1 = result[1]
     distances1 = result[2]
+    count = result[3]
     
     if sa_distance1 < start_distance:
         for connection in connections1:
             plt.plot([cities[connection[0]][0], cities[connection[1]][0]], [cities[connection[0]][1], cities[connection[1]][1]])
         plt.show()
-        x = np.linspace(0, 1000, 999)
+        x = np.linspace(0, count-1, count)
         plt.plot(x, distances1)
         plt.show()
     
-    print("begin: ", start_distance)
-    result = hill_climber(np.sum(start_distance), connections)
-    connections = result[0]
-    sa_distance = result[1]
-    distances = result[2]
+    # print("begin: ", start_distance)
+    # result = hill_climber(np.sum(start_distance), original_connections)
+    # original_connections = result[0]
+    # sa_distance = result[1]
+    # distances = result[2]
     
-    if sa_distance < start_distance:
-        for connection in connections:
-            plt.plot([cities[connection[0]][0], cities[connection[1]][0]], [cities[connection[0]][1], cities[connection[1]][1]])
-        plt.show()
-        x = np.linspace(0, 1000, 999)
-        plt.plot(x, distances)
-        plt.show()
+    # if sa_distance < start_distance:
+    #     for connection in original_connections:
+    #         plt.plot([cities[connection[0]][0], cities[connection[1]][0]], [cities[connection[0]][1], cities[connection[1]][1]])
+    #     plt.show()
+    #     x = np.linspace(0, 100, 99)
+    #     plt.plot(x, distances)
+    #     plt.show()
