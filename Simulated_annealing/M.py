@@ -1,80 +1,202 @@
 import matplotlib.pyplot as plt 
 import numpy as np
-from Making_connections import making_connections
-from Optimalization import optimalization, optimalization1
 from operator import itemgetter
-# Choose TSP file
-file_ = "eil51.tsp.txt"
+import copy
+import random
+import math
+import time
 
-
-def plot_cities():
-    """
-    Reads from data file and plots and saves
-    all coordinates from cities. Returns amount of cities
-    and the cities with coordinates.
-    """
-
-    # Initialize cities
+def make_matrix(tsp_file):
+    """"
+    Creates an adjacency matrix based on the tsp file
+    """ 
+    # Extracting node coordinates from tsp file
     cities = {}
+    counter = 0
+    node_list = []
 
-    # Opens file, reads lines, saves cities and makes a plot of the cities
-    with open(f'TSP_data\{file_}', 'r') as reader:
-        city_count = 1
+    with open(f"TSP_data/{tsp_file}.tsp.txt","r") as reader:
         for line in reader:
+            line = line.strip("\n")
+            line = line.split()
+
             if line[0].isdigit():
-                new_line = line.split()
-                plt.plot(int(new_line[1]), int(new_line[2]), '.')
-                cities[city_count] = (int(new_line[1]), int(new_line[2]))
-                city_count+=1
-    return city_count, cities
 
-# Make values
-values = 0
+                cities[counter] = (line[1], line[2])
+                counter +=1 
+                node_list.append([int(x) for x in line])
 
-while values == 0: 
+    # Creating adjacency matrix
+    num_node = len(node_list)
+    adjacency_matrix = np.zeros((num_node,num_node))
+    for node1 in range(num_node):
+        for node2 in range(num_node):
+            if node1 != node2:
+                x = abs(node_list[node1][1] - node_list[node2][1])
+                y = abs(node_list[node1][2] - node_list[node2][2])
+                dist = np.sqrt(x**2+y**2)
+                adjacency_matrix[node1][node2] = dist
 
-    # Initializes lists and dictionaries
-    connections = []
-    total_cities = []
-    city_1 =[]
-    city_2 = []
-    city_count = plot_cities()[0]
-    cities = plot_cities()[1]
+    return adjacency_matrix, cities
 
-# Makes connections between the initial points    
-    values = making_connections(cities, connections, city_count, city_1, city_2)
+# def acceptance_probability(distance, new_distance, temperature):
+#     """
+#     Calculate probability of accepting new cost
+#     """
+#     if new_distance < distance:
+#         return 1
+#     else:
+#         p = np.exp(- (new_distance - distance) / temperature)
+#         return p
 
-# Returnes values of the connection fuction
-total_distance = values[0]
-connections = values[1]
-city_1 =values[2]
-city_2 = values[3]
+def nearest_neighbour(matrix):
+    order = []
+    total_distance = 0
+    print("matrix len", len(matrix))
+    city_numbers = [i for i in range(0, len(matrix), 1)]
 
-# Shows the connections and total distance
-plt.show()
-print(total_distance)
+    number_1 = np.random.choice(city_numbers)
+    first_city = number_1
 
-# Choose the iterations of simulation
-iterations = 5
-new_lines = 10
+    order.append(first_city)
 
-# Optimizes the route of TSP
-# connections = optimalization(total_distance, connections, total_cities,city_count, iterations, new_lines, cities, city_1, city_2)
+    city_numbers.remove(number_1)
+    number_2 = number_1
 
-print(city_1)
-print(city_2)
+    while len(city_numbers) != 0:
+        closest = math.inf
 
-plt.close()
+        for number in city_numbers:
+            if number == number_1:
+                continue
+            distance = matrix[number_1][number]
 
-# Makes a plot of the new, shortest, route
-plot_cities()
-for con in connections[0]:
-    plt.plot([con[0][0], con[1][0]],[con[0][1], con[1][1]])
-print(total_distance)
+            if distance < closest:
+                closest = distance
+                number_2 = number
+        
+        if number_2 == number_1:
+            continue
 
-plt.show()
+        distance = matrix[number_1][number_2]
+        total_distance += distance
+    
+        order.append(number_2)
+        city_numbers.remove(number_2)
+        number_1 = number_2
 
-x = np.linspace(0, (iterations-1), iterations)
+    # end to begin
+    distance = matrix[number_2][first_city]
+    total_distance += distance
 
-plt.plot(x, connections[1])
-plt.show()
+    return total_distance, order
+
+def simulated_annealing_2opt(matrix, order, distance):
+    start_temp = 10
+    max_iterations = 10
+    accepted = 0
+    count = 0
+
+    distances = []
+    current_distance = distance
+
+    start_time = time.time()
+
+    for iteration in range(max_iterations):
+        print("iteration:", iteration)
+        print("time for iter:", time.time() - start_time)
+        start_time = time.time()
+        for i in range(0, len(order) - 2):
+            for j in range(i + 1, len(order)):
+                backup_order = copy.deepcopy(order)
+                distance = 0
+                if j - i == 1: continue
+
+                switch_1 = order[i]
+                index_1 = i
+                switch_2 = order[j]
+                index_2 = j
+                
+                order[index_1] = switch_2
+                order[index_2] = switch_1
+
+                new_order = copy.deepcopy(order)
+                
+                # calculate cost new order
+                first_city = order[0]
+                current_city = order[0]
+                order.pop(0)
+                while len(order) > 0:
+                    next_city = order[0]
+                    order.pop(0)
+
+                    distance += matrix[current_city][next_city]
+                    current_city = next_city
+                #line from end to start
+                distance += matrix[current_city][first_city]
+
+                current_temp = start_temp - (start_temp/max_iterations) * iteration
+                ap = acceptance_probability(current_distance, distance, current_temp)
+                
+                if random.uniform(0, 1) < ap:
+                    # print("accepted:", current_city, "new:", distance)
+                    current_distance = distance
+                    order = new_order
+                    accepted += 1
+                else:
+                    order = backup_order
+                distances.append(current_distance)
+                count+=1
+        
+    print("accepted:", accepted)
+    return current_distance, distances, count
+
+def opt_order(tsp_file, matrix):
+    distance = 0
+    order = []
+
+    with open(f"TSP_data/{tsp_file}.opt.tour.txt") as data:
+        for row in data:
+            row = row.strip("\n")
+            if row.isdigit():
+                order.append(int(row))
+
+    first_city = order[0] - 1
+    current_city = order[0] - 1
+    order.pop(0)
+
+    while len(order) > 0:
+        next_city = order[0] - 1
+        order.pop(0)
+
+        distance += matrix[current_city][next_city]
+        current_city = next_city
+
+    distance += matrix[current_city][first_city]
+    
+    return distance
+
+if __name__ == "__main__":
+    tsp_file = "a280"
+
+    matrix = make_matrix(tsp_file)
+
+    opt_distance = opt_order(tsp_file, matrix)
+    print(f"{tsp_file}, optimal distance:", opt_distance)
+
+    result = nearest_neighbour(matrix)
+    nn_distance = result[0]
+    nn_order = result[1]
+    print(f"{tsp_file}, nn distance:", nn_distance)
+
+    start_time = time.time()
+    print("start time:", start_time)
+
+    result = simulated_annealing_2opt(matrix, nn_order, nn_distance)
+    sa2opt_distance = result[0]
+    print(sa2opt_distance)
+
+
+
+
+
