@@ -63,7 +63,7 @@ def two_opt(route, cost_mat):
 
 def sa_two_opt(route, cost_mat, distance):
     max_iterations = 1000
-    start_temp = 150
+    start_temp = 100000
     accepted = 0
     distances = []
     best = route
@@ -71,6 +71,7 @@ def sa_two_opt(route, cost_mat, distance):
 
     for iteration in range(max_iterations):
         for i in range(1, len(route) - 2):
+            counter = 0
             for j in range(i + 1, len(route)):
                 if j - i == 1: continue
 
@@ -82,9 +83,42 @@ def sa_two_opt(route, cost_mat, distance):
                     best[i:j] = best[j - 1:i - 1:-1]
                     accepted += 1
                     distance += cost
-                    
+                
                 distances.append(distance)
                 count += 1
+                counter += 1
+
+        route = best
+    return best, distances, count, counter
+
+def sa_two_opt_mm(route, cost_mat, distance, mm):
+    max_iterations = 100
+    start_temp = 1000
+    accepted = 0
+    distances = []
+    best = route
+    count = 0
+
+    for iteration in range(max_iterations):
+        for i in range(1, len(route) - 2):
+            counter = 0
+            for j in range(i + 1, len(route)):
+                counter += 1
+                if j - i == 1: continue
+
+                current_temp = start_temp - (start_temp/max_iterations) * iteration
+                cost = cost_change(cost_mat, best[i - 1], best[i], best[j - 1], best[j])
+                ap = acceptance_probability(cost, current_temp)
+                
+                if random.uniform(0, 1) < ap:
+                    best[i:j] = best[j - 1:i - 1:-1]
+                    accepted += 1
+                    distance += cost
+                
+                distances.append(distance)
+                count += 1
+                if counter == mm:
+                    continue
 
         route = best
     return best, distances, count
@@ -159,12 +193,19 @@ if __name__ == '__main__':
     print("len nn", len(nn_route))
 
     cost_mat = list(matrix)
+
     result = sa_two_opt(nn_route, cost_mat, distance_nn)
     best_route = result[0]
     distances = result[1]
     count = result[2]
+    counter = result[3]
     
     print("na sa cost:", calculate_cost(best_route, matrix))
+    result = sa_two_opt_mm(nn_route, cost_mat, distance_nn, counter/10)
+    best_route = result[0]
+    print("na mm sa cost:", calculate_cost(best_route, matrix))
+
+    exit()
     
     # start plot
     # Initializes lists and dictionaries
