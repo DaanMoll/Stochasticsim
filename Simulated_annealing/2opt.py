@@ -7,7 +7,7 @@ import math
 import pandas as pd
 
 def cooling_schedule(start_temp, max_iterations, iteration, kind):
-    alpha = 3
+    alpha = 1
     if kind  == "Linear":
         current_temp = start_temp/(1 + alpha*iteration)
     # elif kind == "Linear2":
@@ -81,7 +81,6 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, temp):
     max_iterations = max_iterations
     kind = cooling
     accepted = 0
-    tempas = []
     best = route
     count = 0
     iteration = 0
@@ -91,31 +90,33 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, temp):
     #     iteration = 0   
     while iteration < max_iterations:
         iteration+=1
-        count +=1
-        print("Iteration: ",iteration)
+        count = 0
+        # print("Iteration: ",iteration)
         
         for i in range(1, len(route) - 2):
+            i = np.random.randint(1, len(route))
             for j in range(i + 1, len(route)):
                 if j - i == 1: continue
                 current_temp = cooling_schedule(start_temp, max_iterations, iteration, kind)
                 # current_temp = start_temp
                 cost = cost_change(cost_mat, best[i - 1], best[i], best[j - 1], best[j])
                 ap = acceptance_probability(cost, current_temp)
-                if ap != 1:
-                    tempas.append(ap)
+            
                 if random.uniform(0, 1) < ap:
                     best[i:j] = best[j - 1:i - 1:-1]
                     accepted += 1
-                    count = 0
-                    # distance += cost
                     
-                # distances.append(distance)
-        if count == 100:
-            return best
-        print("probabilityt: ", ap)
-        print("Temp: ", round(current_temp,3))
-        print("Distanse: ", round(distance))
-        print(accepted/count)
+                    distance += cost
+        
+                count += 1        # distances.append(distance)
+                if count > 100:
+                    break
+            if count > 100:
+                break
+        # print("probabilityt: ", ap)
+        # print("Temp: ", round(current_temp,3))
+        # print("Distanse: ", round(distance))
+        # print(accepted/count)
         route = best
     return best
 
@@ -184,26 +185,27 @@ if __name__ == '__main__':
     cost_mat = list(matrix)
 
     temperatures = {}
-    temperatures["Quadratic"] = [530, 850, 1700]
-    temperatures["Exponential"] = [150, 220, 450]
-    temperatures["Log"] = [120, 180, 370]
-    temperatures["Linear"] = [530, 850, 1700]
+    temperatures["Quadratic"] = [850]
+    temperatures["Exponential"] = [220]
+    temperatures["Log"] = [180]
+    temperatures["Linear"] = [ 850]
 
     cooling_schedules = ["Linear","Log", "Exponential", "Quadratic"]
 
-    iterations = [10, 50, 100, 500, 1000, 2000]
+    iterations = [10000]
     costs= []
     temperatures_v=[]
     schedules = []
     iteration_v = []
-    for i in range(100):    
+    for i in range(1):    
         for iteration in iterations:
             for cooling in cooling_schedules:
                 temps = temperatures[cooling]
+                print(cooling)
                 for temp in temps:
                     nn_route = nearest_neighbour(matrix)
                     distance_nn = calculate_cost(nn_route, matrix)
-                    # print("nn distance:", distance_nn)
+                    print("nn distance:", distance_nn)
                     # print("len nn", len(nn_route)
                     result = sa_two_opt(nn_route, cost_mat, distance_nn, cooling, iteration, temp)
                     
@@ -219,7 +221,7 @@ if __name__ == '__main__':
     data = {'Iterations':iteration_v, "Cooling_schedule":schedules, "Cost":costs, "Initial temperature":temperatures_v}
     df = pd.DataFrame(data) 
     df
-    df.to_csv("values.csv")
+    df.to_csv("values_100.csv")
     print("na sa cost:", calculate_cost(best_route, matrix))
     
 
@@ -258,4 +260,32 @@ if __name__ == '__main__':
     # count = np.linspace(0, count - 1, count)
     # plt.yscale("log")
     # plt.plot(count, distances)
+    # plt.show()
+
+
+    # def Linear(iteration):
+    #     start_temp = 800
+    #     return start_temp/(1 + 3*iteration)
+
+    # def Log(iteration): 
+    #     start_temp = 800
+    #     log = start_temp/(100 * (np.log(iteration + 1)))
+    #     return log
+
+    # def Exponential(iteration):
+    #     start_temp = 800
+    #     return start_temp*0.9**iteration
+
+    # def Quadratic(iteration):
+    #     start_temp = 800
+    #     return start_temp/(1 + 1* iteration**2)
+
+    # iterations = np.linspace(1, 200 - 1)
+
+
+    # plt.semilogy(Exponential(iterations), label="EXP")
+    # plt.semilogy(Log(iterations), label="LOG")
+    # plt.semilogy(Quadratic(iterations), label="Quad")
+    # plt.semilogy(Linear(iterations), label="LIN")
+    # plt.legend()
     # plt.show()
