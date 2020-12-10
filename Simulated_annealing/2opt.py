@@ -4,6 +4,22 @@ from operator import itemgetter
 import copy
 import random
 import math
+import pandas as pd
+
+def cooling_schedule(start_temp, max_iterations, iteration, kind):
+    alpha = 3
+    if kind  == "Linear":
+        current_temp = start_temp/(1 + alpha*iteration)
+    # elif kind == "Linear2":
+    #     current_temp = start_temp/(start_temp/max_iterations) * iteration
+    elif kind == "Log":
+        # current_temp =  start_temp/(1 + alpha * (math.log(start_temp + iteration, 10)))
+        current_temp =  start_temp/(alpha * (math.log(iteration + 1, 10)))
+    elif kind == "Exponential":
+        current_temp = start_temp*0.9**iteration
+    elif kind == "Quadratic":
+        current_temp =  start_temp/(1 + alpha * iteration**2)
+    return current_temp
 
 def make_matrix(tsp_file):
     """"
@@ -61,67 +77,45 @@ def two_opt(route, cost_mat):
 
     return best
 
-def sa_two_opt(route, cost_mat, distance):
-    max_iterations = 1000
-    start_temp = 100000
+def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, temp):
+    max_iterations = max_iterations
+    kind = cooling
     accepted = 0
-    distances = []
+    tempas = []
     best = route
     count = 0
+    iteration = 0
 
-    for iteration in range(max_iterations):
+    start_temp = temp
+    # for start_temp in temps :
+    #     iteration = 0   
+    while iteration < max_iterations:
+        iteration+=1
+        count +=1
+        print("Iteration: ",iteration)
+        
         for i in range(1, len(route) - 2):
-            counter = 0
             for j in range(i + 1, len(route)):
                 if j - i == 1: continue
-
-                current_temp = start_temp - (start_temp/max_iterations) * iteration
+                current_temp = cooling_schedule(start_temp, max_iterations, iteration, kind)
+                # current_temp = start_temp
                 cost = cost_change(cost_mat, best[i - 1], best[i], best[j - 1], best[j])
                 ap = acceptance_probability(cost, current_temp)
-                
+                if ap != 1:
+                    tempas.append(ap)
                 if random.uniform(0, 1) < ap:
                     best[i:j] = best[j - 1:i - 1:-1]
                     accepted += 1
-                    distance += cost
-                
-                distances.append(distance)
-                count += 1
-                counter += 1
-
+                    # distance += cost
+                    
+                # distances.append(distance)
+        
+        print("probabilityt: ", ap)
+        print("Temp: ", round(current_temp,3))
+        print("Distanse: ", round(distance))
+        print(accepted/count)
         route = best
-    return best, distances, count, counter
-
-def sa_two_opt_mm(route, cost_mat, distance, mm):
-    max_iterations = 100
-    start_temp = 1000
-    accepted = 0
-    distances = []
-    best = route
-    count = 0
-
-    for iteration in range(max_iterations):
-        for i in range(1, len(route) - 2):
-            counter = 0
-            for j in range(i + 1, len(route)):
-                counter += 1
-                if j - i == 1: continue
-
-                current_temp = start_temp - (start_temp/max_iterations) * iteration
-                cost = cost_change(cost_mat, best[i - 1], best[i], best[j - 1], best[j])
-                ap = acceptance_probability(cost, current_temp)
-                
-                if random.uniform(0, 1) < ap:
-                    best[i:j] = best[j - 1:i - 1:-1]
-                    accepted += 1
-                    distance += cost
-                
-                distances.append(distance)
-                count += 1
-                if counter == mm:
-                    continue
-
-        route = best
-    return best, distances, count
+    return best
 
 def calculate_cost(order, matrix):
     distance = 0
@@ -185,59 +179,81 @@ if __name__ == '__main__':
     tsp_file = "a280"
 
     matrix = make_matrix(tsp_file)
-    
-    nodes = len(matrix)
-    nn_route = nearest_neighbour(matrix)
-    distance_nn = calculate_cost(nn_route, matrix)
-    print("nn distance:", distance_nn)
-    print("len nn", len(nn_route))
-
     cost_mat = list(matrix)
 
-    result = sa_two_opt(nn_route, cost_mat, distance_nn)
-    best_route = result[0]
-    distances = result[1]
-    count = result[2]
-    counter = result[3]
+    temperatures = {}
+    temperatures["Quadratic"] = [530, 850, 1700]
+    temperatures["Exponential"] = [150, 220, 450]
+    temperatures["Log"] = [120, 180, 370]
+    temperatures["Linear"] = [530, 850, 1700]
+
+    cooling_schedules = ["Linear","Log", "Exponential", "Quadratic"]
+
+    iterations = [10, 50, 100, 500, 1000, 2000]
+    costs= []
+    temperatures_v=[]
+    schedules = []
+    iteration_v = []
+    for i in range(300):    
+        for iteration in iterations:
+            for cooling in cooling_schedules:
+                temps = temperatures[cooling]
+                for temp in temps:
+                    nn_route = nearest_neighbour(matrix)
+                    distance_nn = calculate_cost(nn_route, matrix)
+                    # print("nn distance:", distance_nn)
+                    # print("len nn", len(nn_route)
+                    result = sa_two_opt(nn_route, cost_mat, distance_nn, cooling, iteration, temp)
+                    
+                    best_route = result
+                    cost = calculate_cost(best_route, matrix)
+                    costs.append(cost)
+                    iteration_v.append(iteration)
+                    schedules.append(cooling)
+                    temperatures_v.append(temp)
+
     
+
+    data = {'Iterations':iteration_v, "Cooling_schedule":schedules, "Cost":costs, "Initial temperature":temperatures_v}
+    df = pd.DataFrame(data) 
+    df
+    df.to_csv("values300sim.csv")
     print("na sa cost:", calculate_cost(best_route, matrix))
-    result = sa_two_opt_mm(nn_route, cost_mat, distance_nn, counter/10)
-    best_route = result[0]
-    print("na mm sa cost:", calculate_cost(best_route, matrix))
-
-    exit()
     
-    # start plot
-    # Initializes lists and dictionaries
-    cities = {}
 
-    # Reads from data file and plots and saves all coordinates from cities
-    with open(f"TSP_data/{tsp_file}.tsp.txt","r") as reader:
-        counter = 0
-        for line in reader:
-            line = line.strip("\n")
-            line = line.split()
+
+
+    # # start plot
+    # # Initializes lists and dictionaries
+    # cities = {}
+
+    # # Reads from data file and plots and saves all coordinates from cities
+    # with open(f"TSP_data/{tsp_file}.tsp.txt","r") as reader:
+    #     counter = 0
+    #     for line in reader:
+    #         line = line.strip("\n")
+    #         line = line.split()
     
-            if line[0].isdigit():
-                # counter+=1
-                plt.plot(int(line[1]), int(line[2]), '.')
-                # plt.annotate(counter, [int(line[1]), int(line[2])], fontsize=8)
+    #         if line[0].isdigit():
+    #             # counter+=1
+    #             plt.plot(int(line[1]), int(line[2]), '.')
+    #             # plt.annotate(counter, [int(line[1]), int(line[2])], fontsize=8)
 
-                cities[counter] = (int(line[1]), int(line[2]))
-                counter+=1
+    #             cities[counter] = (int(line[1]), int(line[2]))
+    #             counter+=1
 
-    route = best_route
-    for i in range(len(route) - 1):
-        city1 = cities[route[i]]
-        city2 = cities[route[i+1]]
-        plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
+    # route = best_route
+    # for i in range(len(route) - 1):
+    #     city1 = cities[route[i]]
+    #     city2 = cities[route[i+1]]
+    #     plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
 
-    city1 = cities[route[-1]]
-    city2 = cities[route[0]]
-    plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
+    # city1 = cities[route[-1]]
+    # city2 = cities[route[0]]
+    # plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
 
-    plt.show()
-    count = np.linspace(0, count - 1, count)
-
-    plt.plot(count, distances)
-    plt.show()
+    # plt.show()
+    # count = np.linspace(0, count - 1, count)
+    # plt.yscale("log")
+    # plt.plot(count, distances)
+    # plt.show()

@@ -13,10 +13,11 @@ def acceptance_probability(distance, new_distance, temperature):
         return 1
     else:
         p = np.exp(- (new_distance - distance) / temperature)
-        # print(p)
         return p
 
 
+    # print(current_temp)
+    return current_temp
 def hill_climber(distance, connections):
     distancess = []
     fout = 0
@@ -206,19 +207,38 @@ def simulated_annealing(distance, connections):
     return connections, current_distance, distancess
 
 def simulated_annealing_2opt(distance, cities, order):
+<<<<<<< HEAD
+    kind  = "Linear"
+    start_temp = 500
+    max_iterations = 100
+=======
     start_temp = 1
     max_iterations = 1
+>>>>>>> 7c86b702449e8c9956bbf81c9af911b6ca972862
     accepted = 0
     count = 0
+    iteration = 0
+    same = 0
+
     distances = []
     current_distance = distance
     # print(cities)
+<<<<<<< HEAD
+    while current_distance > 450 and iteration < 500:    
+        print("Iteration: ", iteration)
+        print("Current distance: ",current_distance)
+        print("Same: ", same)
+        iteration += 1
+        current_distance1 = current_distance
+        
+=======
     start_time = time.time()
 
     for iteration in range(max_iterations):
         print("iteration:", iteration)
         print("time for iter:", time.time() - start_time)
         start_time = time.time()
+>>>>>>> 7c86b702449e8c9956bbf81c9af911b6ca972862
         for i in range(0, len(order) - 2):
             for j in range(i + 1, len(order)):
              
@@ -262,8 +282,12 @@ def simulated_annealing_2opt(distance, cities, order):
                 for connection in connections:
                     new_distance += float(connection[2])
                 # print(new_distance)
+<<<<<<< HEAD
+                current_temp = cooling_schedule(start_temp, max_iterations, iteration, kind)
+=======
 
                 current_temp = start_temp - (start_temp/max_iterations) * iteration
+>>>>>>> 7c86b702449e8c9956bbf81c9af911b6ca972862
                 ap = acceptance_probability(current_distance, new_distance, current_temp)
                 if random.uniform(0, 1) < ap:
                     current_distance = new_distance
@@ -273,6 +297,12 @@ def simulated_annealing_2opt(distance, cities, order):
                     order = backup_order
                 distances.append(current_distance)
                 count+=1
+        print("Current temperature: ",current_temp)
+    
+    if current_distance == current_distance1:
+        same+=1
+    else:
+        same = 0
         
     print("accepted:", accepted)
     print(current_distance)
@@ -391,6 +421,7 @@ if __name__ == "__main__":
 
     result = nearest_neighbour(cities)
     original_connections = result[0]
+    print(len(cities))
     start_distance = result[1]
     order = result[2]
    

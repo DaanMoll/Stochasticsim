@@ -11,13 +11,19 @@ def make_matrix(tsp_file):
     Creates an adjacency matrix based on the tsp file
     """ 
     # Extracting node coordinates from tsp file
+    cities = {}
+    counter = 0
     node_list = []
+
     with open(f"TSP_data/{tsp_file}.tsp.txt","r") as reader:
         for line in reader:
             line = line.strip("\n")
             line = line.split()
 
             if line[0].isdigit():
+
+                cities[counter] = (line[1], line[2])
+                counter +=1 
                 node_list.append([int(x) for x in line])
 
     # Creating adjacency matrix
@@ -31,7 +37,7 @@ def make_matrix(tsp_file):
                 dist = np.sqrt(x**2+y**2)
                 adjacency_matrix[node1][node2] = dist
 
-    return adjacency_matrix
+    return adjacency_matrix, cities
 
 # def acceptance_probability(distance, new_distance, temperature):
 #     """
