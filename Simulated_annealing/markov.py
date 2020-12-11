@@ -7,6 +7,36 @@ import math
 import pandas as pd
 import sys
 
+def plot_route(tsp_file, route):
+    cities = {}
+
+    # Reads from data file and plots and saves all coordinates from cities
+    with open(f"TSP_data/{tsp_file}.tsp.txt","r") as reader:
+        counter = 0
+        for line in reader:
+            line = line.strip("\n")
+            line = line.split()
+    
+            if line[0].isdigit():
+                plt.plot(int(line[1]), int(line[2]), '.')
+                # plt.annotate(counter, [int(line[1]), int(line[2])], fontsize=8)
+
+                cities[counter] = (int(line[1]), int(line[2]))
+                counter+=1
+
+    for i in range(len(route) - 1):
+        city1 = cities[route[i]]
+        city2 = cities[route[i+1]]
+        plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
+
+    city1 = cities[route[-1]]
+    city2 = cities[route[0]]
+    plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
+
+    # count = np.linspace(0, count - 1, count)
+    # plt.plot(count, distances)
+    plt.show()
+
 def make_matrix(tsp_file):
     """"
     Creates an adjacency matrix based on the tsp file
@@ -211,19 +241,27 @@ if __name__ == '__main__':
     cost_mat = list(matrix)
 
     cooling = sys.argv[1]
+    if len(sys.argv) != 2:
+        print("Usage: python markov.py coolingschedule")
 
     temperatures = {}
-    temperatures["Exponential"] = [150, 220, 450]
-    temperatures["Linear"] = [530, 850, 1700]
-    temperatures["Log"] = [120, 180, 370]
-    temperatures["Quadratic"] = [530, 850, 1700]
-    percentages = [70, 80, 90]
+    # temperatures["Exponential"] = [150, 220, 450]
+    # temperatures["Linear"] = [530, 850, 1700]
+    # temperatures["Log"] = [120, 180, 370]
+    # temperatures["Quadratic"] = [530, 850, 1700]
+    # percentages = [70, 80, 90]
+
+    temperatures["Exponential"] = [220]
+    temperatures["Linear"] = [850]
+    temperatures["Log"] = [180]
+    temperatures["Quadratic"] = [850]
+    percentages = [80]
 
     iteration = 10000
-    markov_length = range(10, 151, 10)
+    markov_length = [10, 25, 50, 75, 100, 125, 150]
     
-    costs= []
-    temperatures_v=[]
+    costs = []
+    temperatures_v = []
     schedules = []
     percentage_v = []
     init_routes = []
@@ -239,7 +277,7 @@ if __name__ == '__main__':
             temp = temps[i]
             percentage = percentages[i]
 
-            max_i = 101
+            max_i = 1
             for i in range(1, max_i):
                 nn_route = nearest_neighbour(matrix)
                 distance_nn = calculate_cost(nn_route, matrix)
@@ -257,7 +295,20 @@ if __name__ == '__main__':
                 routes.append(best_route)
                 markovs.append(markov)
 
+
     data = {"Cooling_schedule":schedules, "Markov":markovs, "Cost":costs, "Percentage": percentage_v, "Routes":routes, "Init routes": init_routes}
     df = pd.DataFrame(data) 
     df
     df.to_csv(f"data/values_{cooling}_{max_i}_iter.csv")
+
+    # print(costs)
+    # minimum_cost = min(costs)
+    # index_minimum = costs.index(minimum_cost)
+    # cheapest_route = routes[index_minimum]
+    # init_route = init_routes[index_minimum]
+
+    # print(minimum_cost)
+
+    # plot_route(tsp_file, cheapest_route)
+
+
