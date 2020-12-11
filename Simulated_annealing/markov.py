@@ -240,9 +240,11 @@ if __name__ == '__main__':
     matrix = make_matrix(tsp_file)
     cost_mat = list(matrix)
 
-    cooling = sys.argv[1]
-    if len(sys.argv) != 2:
+    if len(sys.argv) <= 1:
         print("Usage: python markov.py coolingschedule")
+        exit()
+
+    cooling = sys.argv[1]
 
     temperatures = {}
     # temperatures["Exponential"] = [150, 220, 450]
