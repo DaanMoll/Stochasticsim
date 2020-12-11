@@ -105,6 +105,7 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, temp):
                 if random.uniform(0, 1) < ap:
                     best[i:j] = best[j - 1:i - 1:-1]
                     accepted += 1
+<<<<<<< HEAD
                     
                     distance += cost
         
@@ -117,6 +118,16 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, temp):
         # print("Temp: ", round(current_temp,3))
         # print("Distanse: ", round(distance))
         # print(accepted/count)
+=======
+                    # distance += cost
+                    
+                # distances.append(distance)
+        
+        print("probabilityt: ", ap)
+        print("Temp: ", round(current_temp,3))
+        print("Distanse: ", round(distance))
+        print(accepted/count)
+>>>>>>> a2dcb38ce6123abe817463332f607e4c3ebf4760
         route = best
     return best
 
@@ -197,7 +208,11 @@ if __name__ == '__main__':
     temperatures_v=[]
     schedules = []
     iteration_v = []
+<<<<<<< HEAD
     for i in range(1):    
+=======
+    for i in range(300):    
+>>>>>>> a2dcb38ce6123abe817463332f607e4c3ebf4760
         for iteration in iterations:
             for cooling in cooling_schedules:
                 temps = temperatures[cooling]
@@ -221,7 +236,11 @@ if __name__ == '__main__':
     data = {'Iterations':iteration_v, "Cooling_schedule":schedules, "Cost":costs, "Initial temperature":temperatures_v}
     df = pd.DataFrame(data) 
     df
+<<<<<<< HEAD
     df.to_csv("values_100.csv")
+=======
+    df.to_csv("values300sim.csv")
+>>>>>>> a2dcb38ce6123abe817463332f607e4c3ebf4760
     print("na sa cost:", calculate_cost(best_route, matrix))
     
 
