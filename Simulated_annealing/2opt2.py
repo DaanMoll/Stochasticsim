@@ -166,22 +166,6 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp):
                     best[i:j] = best[j - 1:i - 1:-1]
                     distance += cost
 
-                if count >= 1000:
-                    break
-            if count >= 1000:
-                break
-        # print(count)
-
-        # distance = round(distance, 5)
-        # if prev_distance == distance:
-        #     counter += 1
-        #     # print("hoi", counter, iteration)
-        #     if counter >= 100:
-        #         print("klaar", iteration, distance)
-        #         return best
-        # else:
-        #     counter = 0
-
         prev_distance = distance
 
         route = best

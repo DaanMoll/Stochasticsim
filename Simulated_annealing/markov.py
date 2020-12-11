@@ -258,11 +258,7 @@ if __name__ == '__main__':
     percentages = [80]
 
     iteration = 10000
-<<<<<<< HEAD
-    markov_length = range(10, 150, 10)
-=======
     markov_length = [10, 25, 50, 75, 100, 125, 150]
->>>>>>> f6e11519ac90a558ab7e52e0d2dd1244b18bc726
     
     costs = []
     temperatures_v = []
