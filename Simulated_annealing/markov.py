@@ -258,17 +258,14 @@ if __name__ == '__main__':
     percentages = [80]
 
     iteration = 10000
-<<<<<<< HEAD
-    markov_length = range(10, 150, 10)
-=======
     markov_length = [10, 25, 50, 75, 100, 125, 150]
->>>>>>> f6e11519ac90a558ab7e52e0d2dd1244b18bc726
     
     costs = []
     temperatures_v = []
     schedules = []
     percentage_v = []
     init_routes = []
+    init_costs = []
     routes = []
     markovs = []
     
@@ -281,38 +278,26 @@ if __name__ == '__main__':
             temp = temps[i]
             percentage = percentages[i]
 
-            max_i = 1
+            max_i = 101
             for i in range(1, max_i):
                 nn_route = nearest_neighbour(matrix)
                 distance_nn = calculate_cost(nn_route, matrix)
                 init_routes.append(nn_route)
-                # print("nn distance:", distance_nn)
+                init_costs.append(distance_nn)
 
-                result = sa_two_opt(nn_route, cost_mat, distance_nn, cooling, iteration, temp, markov)
-                best_route = result
-                # print(f"{iteration} iter, {markov} ml, cost:", calculate_cost(best_route, matrix))
-                
+                backup_nn = copy.deepcopy(nn_route)
+                best_route = sa_two_opt(backup_nn, cost_mat, distance_nn, cooling, iteration, temp, markov)
                 cost = calculate_cost(best_route, matrix)
+                
+                routes.append(best_route)
                 costs.append(cost)
                 percentage_v.append(percentage)
                 schedules.append(cooling)
-                routes.append(best_route)
                 markovs.append(markov)
-
-
-    data = {"Cooling_schedule":schedules, "Markov":markovs, "Cost":costs, "Percentage": percentage_v, "Routes":routes, "Init routes": init_routes}
+    
+    data = {"Cooling_schedule":schedules, "Markov":markovs, "Init cost":init_costs, "Cost":costs, "Percentage":percentage_v, "Routes":routes, "Init routes":init_routes}
     df = pd.DataFrame(data) 
     df
     df.to_csv(f"data/values_{cooling}_{max_i}_iter.csv")
-
-    # print(costs)
-    # minimum_cost = min(costs)
-    # index_minimum = costs.index(minimum_cost)
-    # cheapest_route = routes[index_minimum]
-    # init_route = init_routes[index_minimum]
-
-    # print(minimum_cost)
-
-    # plot_route(tsp_file, cheapest_route)
 
 

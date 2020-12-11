@@ -143,9 +143,7 @@ def cooling_schedule(start_temp, max_iterations, iteration, kind):
 
 def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp):
     best = route
-    prev_distance = 0
     iteration = 0
-    counter = 0
 
     while iteration < max_iterations:
         iteration += 1
@@ -155,8 +153,6 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp):
             for j in range(i + 1, len(route)):
                 if j - i == 1: 
                     continue
-
-                count += 1
                 
                 current_temp = cooling_schedule(start_temp, max_iterations, iteration, cooling)
                 cost = cost_change(cost_mat, best[i - 1], best[i], best[j - 1], best[j])
@@ -165,22 +161,6 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp):
                 if random.uniform(0, 1) < ap:
                     best[i:j] = best[j - 1:i - 1:-1]
                     distance += cost
-
-                if count >= 1000:
-                    break
-            if count >= 1000:
-                break
-        # print(count)
-
-        # distance = round(distance, 5)
-        # if prev_distance == distance:
-        #     counter += 1
-        #     # print("hoi", counter, iteration)
-        #     if counter >= 100:
-        #         print("klaar", iteration, distance)
-        #         return best
-        # else:
-        #     counter = 0
 
         prev_distance = distance
 
