@@ -20,12 +20,12 @@ def plot(route, version):
                 counter+=1
 
     for i in range(len(route) - 1):
-        city1 = cities[route[i]]
-        city2 = cities[route[i+1]]
+        city1 = cities[int(route[i])]
+        city2 = cities[int(route[i+1])]
         plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
 
-    city1 = cities[route[-1]]
-    city2 = cities[route[0]]
+    city1 = cities[int(route[-1])]
+    city2 = cities[int(route[0])]
     plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
 
-    plt.savefig(f'{version}_route.png')
+    plt.savefig(f'images/{version}_route.png')
