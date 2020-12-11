@@ -105,20 +105,6 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, temp):
                 if random.uniform(0, 1) < ap:
                     best[i:j] = best[j - 1:i - 1:-1]
                     accepted += 1
-<<<<<<< HEAD
-                    
-                    distance += cost
-        
-                count += 1        # distances.append(distance)
-                if count > 100:
-                    break
-            if count > 100:
-                break
-        # print("probabilityt: ", ap)
-        # print("Temp: ", round(current_temp,3))
-        # print("Distanse: ", round(distance))
-        # print(accepted/count)
-=======
                     # distance += cost
                     
                 # distances.append(distance)
@@ -127,7 +113,6 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, temp):
         print("Temp: ", round(current_temp,3))
         print("Distanse: ", round(distance))
         print(accepted/count)
->>>>>>> a2dcb38ce6123abe817463332f607e4c3ebf4760
         route = best
     return best
 
@@ -208,11 +193,7 @@ if __name__ == '__main__':
     temperatures_v=[]
     schedules = []
     iteration_v = []
-<<<<<<< HEAD
-    for i in range(1):    
-=======
     for i in range(300):    
->>>>>>> a2dcb38ce6123abe817463332f607e4c3ebf4760
         for iteration in iterations:
             for cooling in cooling_schedules:
                 temps = temperatures[cooling]
@@ -236,75 +217,37 @@ if __name__ == '__main__':
     data = {'Iterations':iteration_v, "Cooling_schedule":schedules, "Cost":costs, "Initial temperature":temperatures_v}
     df = pd.DataFrame(data) 
     df
-<<<<<<< HEAD
-    df.to_csv("values_100.csv")
-=======
     df.to_csv("values300sim.csv")
->>>>>>> a2dcb38ce6123abe817463332f607e4c3ebf4760
     print("na sa cost:", calculate_cost(best_route, matrix))
     
 
 
+def plot_route(tsp_file, route):
+    cities = {}
 
-    # # start plot
-    # # Initializes lists and dictionaries
-    # cities = {}
-
-    # # Reads from data file and plots and saves all coordinates from cities
-    # with open(f"TSP_data/{tsp_file}.tsp.txt","r") as reader:
-    #     counter = 0
-    #     for line in reader:
-    #         line = line.strip("\n")
-    #         line = line.split()
+    # Reads from data file and plots and saves all coordinates from cities
+    with open(f"TSP_data/{tsp_file}.tsp.txt","r") as reader:
+        counter = 0
+        for line in reader:
+            line = line.strip("\n")
+            line = line.split()
     
-    #         if line[0].isdigit():
-    #             # counter+=1
-    #             plt.plot(int(line[1]), int(line[2]), '.')
-    #             # plt.annotate(counter, [int(line[1]), int(line[2])], fontsize=8)
+            if line[0].isdigit():
+                plt.plot(int(line[1]), int(line[2]), '.')
+                # plt.annotate(counter, [int(line[1]), int(line[2])], fontsize=8)
 
-    #             cities[counter] = (int(line[1]), int(line[2]))
-    #             counter+=1
+                cities[counter] = (int(line[1]), int(line[2]))
+                counter+=1
 
-    # route = best_route
-    # for i in range(len(route) - 1):
-    #     city1 = cities[route[i]]
-    #     city2 = cities[route[i+1]]
-    #     plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
+    for i in range(len(route) - 1):
+        city1 = cities[route[i]]
+        city2 = cities[route[i+1]]
+        plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
 
-    # city1 = cities[route[-1]]
-    # city2 = cities[route[0]]
-    # plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
+    city1 = cities[route[-1]]
+    city2 = cities[route[0]]
+    plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
 
-    # plt.show()
     # count = np.linspace(0, count - 1, count)
-    # plt.yscale("log")
     # plt.plot(count, distances)
-    # plt.show()
-
-
-    # def Linear(iteration):
-    #     start_temp = 800
-    #     return start_temp/(1 + 3*iteration)
-
-    # def Log(iteration): 
-    #     start_temp = 800
-    #     log = start_temp/(100 * (np.log(iteration + 1)))
-    #     return log
-
-    # def Exponential(iteration):
-    #     start_temp = 800
-    #     return start_temp*0.9**iteration
-
-    # def Quadratic(iteration):
-    #     start_temp = 800
-    #     return start_temp/(1 + 1* iteration**2)
-
-    # iterations = np.linspace(1, 200 - 1)
-
-
-    # plt.semilogy(Exponential(iterations), label="EXP")
-    # plt.semilogy(Log(iterations), label="LOG")
-    # plt.semilogy(Quadratic(iterations), label="Quad")
-    # plt.semilogy(Linear(iterations), label="LIN")
-    # plt.legend()
-    # plt.show()
+    plt.show()
