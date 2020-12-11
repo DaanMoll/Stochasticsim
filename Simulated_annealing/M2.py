@@ -354,8 +354,7 @@ def nearest_neighbour(cities):
 
     return connections, np.sum(total_distance), order
 
-def opt_order(cities):
-    order = []
+def opt_order(cities,order):
     connections = []
 
     with open("TSP_data/a280.opt.tour.txt") as data:
@@ -363,7 +362,7 @@ def opt_order(cities):
             row = row.strip("\n")
             if row.isdigit():
                 order.append(int(row))
-    order = [38, 33, 32, 44, 26, 35, 7, 3, 12, 17, 27, 37, 24, 21, 10, 0, 5, 15, 13, 25, 20, 36, 8, 31, 18, 1, 45, 11, 39, 14, 40, 29, 19, 50, 6, 4, 9, 47, 43, 28, 46, 34, 16, 49, 48, 30, 42, 23, 41, 22, 2]
+    
     first_city = order[0]
     print("first", first_city)
     current_city = order[0]
