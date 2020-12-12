@@ -280,7 +280,7 @@ if __name__ == '__main__':
             temp = temps[i]
             percentage = percentages[i]
 
-            max_i = 101
+            max_i = 301
             for i in range(1, max_i):
                 nn_route = nearest_neighbour(matrix)
                 distance_nn = calculate_cost(nn_route, matrix)
