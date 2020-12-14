@@ -11,7 +11,7 @@ from plot import plot
 plt.style.use('ggplot')
 
 def convergence_compare():
-    files = ["Log_301"] 
+    files = ["Log_301", "Exponential_301", "Linear_301", "Quadratic_301"] 
     frames = []
     for file_ in files:
         data = pd.read_csv(f'data/values_{file_}_iter.csv') 
