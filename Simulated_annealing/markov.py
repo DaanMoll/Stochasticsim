@@ -247,20 +247,20 @@ if __name__ == '__main__':
     cooling = sys.argv[1]
 
     temperatures = {}
-    # temperatures["Exponential"] = [150, 220, 450]
-    # temperatures["Linear"] = [530, 850, 1700]
-    # temperatures["Log"] = [120, 180, 370]
-    # temperatures["Quadratic"] = [530, 850, 1700]
-    # percentages = [70, 80, 90]
+    temperatures["Exponential"] = [150, 220, 450]
+    temperatures["Linear"] = [530, 850, 1700]
+    temperatures["Log"] = [120, 180, 370]
+    temperatures["Quadratic"] = [530, 850, 1700]
+    percentages = [70, 80, 90]
 
-    temperatures["Exponential"] = [220]
-    temperatures["Linear"] = [850]
-    temperatures["Log"] = [180]
-    temperatures["Quadratic"] = [850]
-    percentages = [80]
+    # temperatures["Exponential"] = [220]
+    # temperatures["Linear"] = [850]
+    # temperatures["Log"] = [180]
+    # temperatures["Quadratic"] = [850]
+    # percentages = [80]
 
     iteration = 10000
-    markov_length = [10, 25, 50, 75, 100, 125, 150]
+    markov_length = [150]
     
     costs = []
     temperatures_v = []
@@ -300,6 +300,6 @@ if __name__ == '__main__':
     data = {"Cooling_schedule":schedules, "Markov":markovs, "Init cost":init_costs, "Cost":costs, "Percentage":percentage_v, "Routes":routes, "Init routes":init_routes}
     df = pd.DataFrame(data) 
     df
-    df.to_csv(f"data/values_{cooling}_{max_i}_iter.csv")
+    df.to_csv(f"data/values_{cooling}_{max_i}_iter{markov_length[0]}ml.csv")
 
 
