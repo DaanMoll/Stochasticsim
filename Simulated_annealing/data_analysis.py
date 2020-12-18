@@ -11,6 +11,9 @@ from plot import plot
 plt.style.use('ggplot')
 
 def convergence_compare():
+    """
+    Creates boxplots and convergence comparison between the 4 cooling systems
+    """
     files = ["Log_301", "Exponential_301", "Linear_301", "Quadratic_301"] 
     frames = []
     for file_ in files:
@@ -60,133 +63,95 @@ def convergence_compare():
     print(new_route)
     plot(old_route, "Old")
     plot(new_route, "New")
-
-def costs_plot():
-    files = ["Log_301", "Exponential_301", "Linear_301", "Quadratic_301"]
-    costs1 = [] 
-    total_300 = []
-    cooling_schedule = []
-    iterations = []
-
-    for file_ in files:
-        name = file_.strip("_301")
-        frames = []
-        
-        data = pd.read_csv(f'/Users/daan/Library/Mobile Documents/com~apple~CloudDocs/Uni/Master Computational Science/Stochastic/data/values_{file_}_iter100ml.csv') 
-        df = pd.DataFrame(data)
-        df = df.loc[df['Percentage'] == 80] 
-        frames.append(df)
-
-        result = pd.concat(frames)
-
-        cost_run = result["Cost in run"]
-        for costs in cost_run:
-            cost = costs[1:]
-            cost = cost[:-1]
-            cost = cost.split(", ")
-            costs1.append(cost)
-
-        for i in range(len(costs1[0])):
-            all_300 = []
-            for iteration in costs1:
-                all_300.append(float(iteration[i]))
-
-            total_300.append(np.mean(all_300))
-            cooling_schedule.append(name)
-            iterations.append(i+1)
-    
-    print(iterations[-1], "einde")
-    exit()
-    data = {"Cost in run":total_300, "Iter2":iterations, "Cooling":cooling_schedule}
-    df = pd.DataFrame(data) 
-    
-    ax = sns.lineplot(data=df, x="Iter2", y="Cost in run", hue="Cooling")
-    
-    ax.set_title(f"Convergence of cost using different cooling schedules")
-    ax.set_xlabel("Iteration")
-    ax.set_ylabel("Cost")
-    ax.set(xscale="linear", yscale="log")
-    figure = ax.get_figure()
-    figure.savefig(f'images/Convergence100_{name}.png')
-
-def costs_plot2():
-    file_ = "Log_301"
-    costs1 = [] 
-    total_300 = []
-    cooling_schedule = []
-    iterations = []
-    markov = []
+         
+def conv_lin_ml():
+    """
+    Creates plot of convergence of the linear cooling schedule at different markov lengts
+    """
+    file_ = "Linear_100"
+    frames = []
+    costs1 = []
 
     
-    data = pd.read_csv(f'/Users/daan/Library/Mobile Documents/com~apple~CloudDocs/Uni/Master Computational Science/Stochastic/data/values_{file_}_iter10ml_2.csv') 
+    data = pd.read_csv(f'data/Convergence_{file_}.csv') 
     
     df = pd.DataFrame(data)
-    # markov_lengths = [10, 25, 50, 75, 100, 125, 150]
-    markov_lengths = [100]
-    for ml in markov_lengths:
-        frames = []
-        ff = df.loc[df['Markov'] == ml] 
-        frames.append(ff)
+    markov_lengths = [10, 25, 50, 75, 100, 125, 150]
+    frames.append(df)
 
-        result = pd.concat(frames)
+    result = pd.concat(frames)
 
-        cost_run = result["Cost in run"]
+    all_iters = []
 
-        for costs in cost_run:
-            cost = costs[1:]
-            cost = cost[:-1]
-            cost = cost.split(", ")
-            costs1.append(cost)
-
-        for i in range(len(costs1[0])):
-            all_300 = []
-            for iteration in costs1:
-                all_300.append(float(iteration[i]))
-
-            total_300.append(np.mean(all_300))
-            markov.append(ml)
-            iterations.append(i+1)
-        
-    data = {"Cost in run":total_300, "Iter2":iterations, "Markov":markov}
-    df = pd.DataFrame(data) 
+    itera = result["Iter2"]
+    for iters in itera:
+        iters = iters[1:]
+        iters = iters[:-1]
+        iters = iters.split(", ")
+        all_iters.append(iters)
     
-    ax = sns.lineplot(data=df, x="Iter2", y="Cost in run", hue="Markov")
+    print(all_iters[0][-1], all_iters[0][-2], len(all_iters[0]))
+
+    cost_run = result["Cost in run"]
+    for costs in cost_run:
+        cost = costs[1:]
+        cost = cost[:-1]
+        cost = cost.split(", ")
+        costs1.append(cost)
+
+    print(len(costs1[0]), costs1[0][-1], len(costs1))
+
+    markovs = []
+    total_costs = []
+    iterations = []
+
+    for i in range(len(costs1)):
+        ml = markov_lengths[i%7]
+        run = costs1[i]
+        for j in range(len(costs1[0])):
+            iterations.append(j+1)
+            markovs.append(ml)
+            total_costs.append(float(run[j]))
+
+    print(iterations[-1])
+
+    data = {"Markov":markovs, "Cost in run":total_costs, "Iter2":iterations}
+    df = pd.DataFrame(data)
+
+    ax = sns.lineplot(data=df, x="Iter2", y="Cost in run", hue="Markov", ci=None)
     
-    ax.set_title(f"Convergence of log with different ML")
+    ax.set_title(f"Convergence of the linear cooling schedule with different ML")
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Cost")
     ax.set(xscale="linear", yscale="log")
     figure = ax.get_figure()
-    figure.savefig(f'images/Convergence_ML_LOG.png')
+    figure.savefig(f'images/Convergence_lin.png')
 
-def costs_plot3():
+def convergence_all():
+    """
+    Creates png of convergence of the cooling schedules over iterations
+    """
     files = ["Log_301", "Exponential_301", "Linear_301", "Quadratic_301"]
     frames = []
 
     for file_ in files:
-        name = file_.strip("_301")
-        
-        data = pd.read_csv(f'data/values_{file_}_iter100ml.csv') 
+        data = pd.read_csv(f'/Users/daan/Library/Mobile Documents/com~apple~CloudDocs/Uni/Master Computational Science/Stochastic/data2/values_{file_}_iter100ml.csv') 
         df = pd.DataFrame(data)
-        # df = df.loc[df['Percentage'] == 80] 
         frames.append(df)
 
     result = pd.concat(frames)
-    print("hey kamiel")
-    sns.color_palette("tab10")
+    
     ax = sns.lineplot(data=result, x="Iter2", y="Cost in run", hue="Cooling_schedule", ci=None)
-    print("nu gaat die lekker")
-    sns.color_palette("tab10")
     ax.set_title(f"Convergence of cost using different cooling schedules")
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Cost")
-    ax.set(xscale="linear", yscale="log")
+    ax.set(xscale="log", yscale="log")
+
     figure = ax.get_figure()
     figure.savefig(f'images/Convergence_all4.png')
 
 
 if __name__ == "__main__":
     # convergence_compare()
-    # costs_plot()
-    # costs_plot2()
-    costs_plot3()
+    convergence_all()
+    conv_lin_ml()

@@ -8,6 +8,9 @@ import pandas as pd
 import sys
 
 def plot_route(tsp_file, route):
+    """
+    Plot TSP map with route given as input.
+    """
     cities = {}
 
     # Reads from data file and plots and saves all coordinates from cities
@@ -19,8 +22,6 @@ def plot_route(tsp_file, route):
     
             if line[0].isdigit():
                 plt.plot(int(line[1]), int(line[2]), '.')
-                # plt.annotate(counter, [int(line[1]), int(line[2])], fontsize=8)
-
                 cities[counter] = (int(line[1]), int(line[2]))
                 counter+=1
 
@@ -32,9 +33,6 @@ def plot_route(tsp_file, route):
     city1 = cities[route[-1]]
     city2 = cities[route[0]]
     plt.plot([city1[0], city2[0]], [city1[1], city2[1]])
-
-    # count = np.linspace(0, count - 1, count)
-    # plt.plot(count, distances)
     plt.show()
 
 def make_matrix(tsp_file):
@@ -65,6 +63,9 @@ def make_matrix(tsp_file):
     return adjacency_matrix
 
 def nearest_neighbour(matrix):
+    """
+    Nearest neighbour heuristic. Pick random starting city, followed by connecting to closes neighbour.
+    """
     order = []
     total_distance = 0
     city_numbers = [i for i in range(0, len(matrix), 1)]
@@ -102,48 +103,13 @@ def nearest_neighbour(matrix):
     # end to begin
     distance = matrix[number_2][first_city]
     total_distance += distance
-    return order
 
-def nearest_neighbour2(matrix):
-    order = []
-    total_distance = 0
-    city_numbers = [i for i in range(0, len(matrix), 1)]
-
-    number_1 = np.random.choice(city_numbers)
-    first_city = number_1
-
-    city_numbers.remove(number_1)
-    number_2 = number_1
-
-    while len(city_numbers) != 0:
-        closest = math.inf
-
-        for number in city_numbers:
-            if number == number_1:
-                continue
-            distance = matrix[number_1][number]
-
-            if distance < closest:
-                closest = distance
-                number_2 = number
-        
-        if number_2 == number_1:
-            continue
-
-        distance = matrix[number_1][number_2]
-        total_distance += distance
-    
-        order.append(number_2)
-        city_numbers.remove(number_2)
-        number_1 = number_2
-
-    # end to begin
-    distance = matrix[number_2][first_city]
-    order.append(first_city)
-    total_distance += distance
     return order
 
 def calculate_cost(order, matrix):
+    """
+    Calculates cost of given route/order
+    """
     distance = 0
     order = copy.deepcopy(order)
     first_city = order[0]
@@ -162,6 +128,9 @@ def calculate_cost(order, matrix):
     return distance
 
 def two_opt(route, cost_mat):
+    """
+    Basic two opt algorithm
+    """
     best = route
     improved = True
     while improved:
@@ -177,6 +146,9 @@ def two_opt(route, cost_mat):
     return best
 
 def cost_change(cost_mat, n1, n2, n3, n4):
+    """
+    Return change of cost after 2 opt has been applied
+    """
     return cost_mat[n1][n3] + cost_mat[n2][n4] - cost_mat[n1][n2] - cost_mat[n3][n4]
 
 def acceptance_probability(cost, temperature):
@@ -190,6 +162,9 @@ def acceptance_probability(cost, temperature):
         return p
 
 def cooling_schedule(start_temp, max_iterations, iteration, kind):
+    """
+    Calculate current temperature with the according cooling schedule
+    """
     if kind  == "Linear":
         # multiplicative
         alpha = 1
@@ -200,34 +175,32 @@ def cooling_schedule(start_temp, max_iterations, iteration, kind):
         current_temp =  start_temp/(alpha * (math.log(iteration + 1, 10)))
     elif kind == "Exponential":
         # multiplicative
-        current_temp = start_temp*0.9**iteration
+        alpha = 0.9
+        current_temp = start_temp*alpha**iteration
     elif kind == "Quadratic":
         # multiplicative
         alpha = 1
         current_temp = start_temp/(1 + alpha * iteration**2)
-<<<<<<< HEAD
 
     # print("doei", kind)
-=======
-    
->>>>>>> 191796ccb0fb5d14823129bccd9d1894538400ea
     return current_temp
 
 def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, markov_length):
+    """
+    Simulated annealing algorithm, using the 2 opt algorithm to create new states.
+    """
     best = route
-    iteration = 0
-<<<<<<< HEAD
     costs = []
-    count = 0
-    counter = 0
     iter2 = []
     cooling2 = []
-=======
->>>>>>> 191796ccb0fb5d14823129bccd9d1894538400ea
+    count = 0
+    counter = 0
 
+    iteration = 0
     while iteration < max_iterations:
         iteration += 1
         
+        # Remove 2 lines markov_lenght amount of tim
         for _ in range(markov_length):
             i = random.randint(1, len(route) - 1)
             j = random.randint(1, len(route) - 1)
@@ -239,11 +212,12 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, m
             cost = cost_change(cost_mat, best[i - 1], best[i], best[j - 1], best[j])
             ap = acceptance_probability(cost, current_temp)
 
+            # check if next state to be accepted
             if random.uniform(0, 1) < ap:
                 best[i:j] = best[j - 1:i - 1:-1]
                 distance += cost
 
-<<<<<<< HEAD
+            # Save 1 in 100 steps for plot
             if counter % 100 == 0:
                 costs.append(calculate_cost(best, cost_mat))
                 count += 1
@@ -254,10 +228,6 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, m
 
         route = best
     return best, costs, iter2, cooling2
-=======
-        route = best
-    return best
->>>>>>> 191796ccb0fb5d14823129bccd9d1894538400ea
 
 
 if __name__ == '__main__':
