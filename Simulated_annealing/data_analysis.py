@@ -61,6 +61,93 @@ def convergence_compare():
     plot(old_route, "Old")
     plot(new_route, "New")
 
+def costs_plot():
+    files = ["Log_301", "Exponential_301", "Linear_301", "Quadratic_301"]
+    costs1 = [] 
+    total_300 = []
+    cooling_schedule = []
+    iterations = []
+
+    for file_ in files:
+        name = file_.strip("_301")
+        frames = []
+        data = pd.read_csv(f'data/values_{file_}_iter100ml.csv') 
+        df = pd.DataFrame(data)
+        df = df.loc[df['Percentage'] == 80] 
+        frames.append(df)
+
+        result = pd.concat(frames)
+
+        cost_run = result["Cost in run"]
+        for costs in cost_run:
+            cost = costs[1:]
+            cost = cost[:-1]
+            cost = cost.split(", ")
+            costs1.append(cost)
+
+        for i in range(len(costs1[0])):
+            all_300 = []
+            for iteration in costs1:
+                all_300.append(float(iteration[i]))
+
+            total_300.append(np.mean(all_300))
+            cooling_schedule.append(name)
+            iterations.append(i+1)
+
+        
+    data = {"Cost in run":total_300, "Iter2":iterations, "Cooling":cooling_schedule}
+    df = pd.DataFrame(data) 
+    
+    ax = sns.lineplot(data=df, x="Iter2", y="Cost in run", hue="Cooling")
+    
+    ax.set_title(f"Convergence of cost using different cooling schedules")
+    ax.set_xlabel("Iteration")
+    ax.set_ylabel("Cost")
+    figure = ax.get_figure()
+    figure.savefig(f'images/Convergence100_{name}.png')
+
+def costs_plot2():
+    files = ["Log_301", "Exponential_301", "Linear_301", "Quadratic_301"]
+    costs1 = [] 
+    total_300 = []
+    cooling_schedule = []
+    iterations = []
+
+    frames = []
+
+    for file_ in files:
+        name = file_.strip("_301")
+        data = pd.read_csv(f'data/values_{file_}_iter100ml.csv') 
+        df = pd.DataFrame(data)
+        df = df.loc[df['Percentage'] == 80] 
+        frames.append(df)
+
+    result = pd.concat(frames)
+
+    # Checks for convergence 
+    ax = sns.lineplot(data=result, x="Iter2", y="Cost", hue="Cooling_schedule")
+    figure = ax.get_figure()
+    figure.savefig(f'images/Convergence_301.png')
+    plt.show()
+
 
 if __name__ == "__main__":
-    convergence_compare()
+    # convergence_compare()
+    costs_plot2()
+
+
+    # oud van costs plot
+    # iter2 = result["Iter2"][0]
+    # iter2 = iter2[1:]
+    # iter2 = iter2[:-1]
+    # iter2 = iter2.split(", ")
+
+    # # cost_run = result["Cost in run"][0]
+    # # cost = cost_run[1:]
+    # # cost = cost[:-1]
+    # # cost = cost.split(", ")
+
+    # for i in range(0, len(cost)): 
+    #     iter2[i] = int(iter2[i])
+    
+    # print("amount of points:", iter2[-1], len(iter2), len(mean_300))

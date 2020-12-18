@@ -271,8 +271,7 @@ if __name__ == '__main__':
     percentages = [80]
 
     iteration = 10000
-    # markov_length = [10, 25, 50, 75, 100, 125, 150]
-    markov_length = [100]
+    markov_length = [10, 25, 50, 75, 100, 125, 150]
     
     costs = []
     temperatures_v = []
@@ -322,6 +321,6 @@ if __name__ == '__main__':
     data = {"Cooling_schedule":schedules, "Markov":markovs, "Init cost":init_costs, "Cost":costs, "Percentage":percentage_v, "Routes":routes, "Init routes":init_routes, "Cost in run":cost_during_run, "Iter2":iter2}
     df = pd.DataFrame(data) 
     df
-    df.to_csv(f"data/values_{cooling}_{max_i}_iter{markov_length[0]}ml.csv")
+    df.to_csv(f"data/values_{cooling}_{max_i}_iter{markov_length[0]}ml_2.csv")
 
 
