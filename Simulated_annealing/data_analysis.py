@@ -190,20 +190,3 @@ if __name__ == "__main__":
     # costs_plot()
     # costs_plot2()
     costs_plot3()
-
-
-    # oud van costs plot
-    # iter2 = result["Iter2"][0]
-    # iter2 = iter2[1:]
-    # iter2 = iter2[:-1]
-    # iter2 = iter2.split(", ")
-
-    # # cost_run = result["Cost in run"][0]
-    # # cost = cost_run[1:]
-    # # cost = cost[:-1]
-    # # cost = cost.split(", ")
-
-    # for i in range(0, len(cost)): 
-    #     iter2[i] = int(iter2[i])
-    
-    # print("amount of points:", iter2[-1], len(iter2), len(mean_300))

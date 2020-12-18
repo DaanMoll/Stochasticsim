@@ -65,8 +65,4 @@ for NEW_CUSTOMERS in NEW_CUSTOMERSS:
 data = {"Servers":simmulation,"Values":c1, "Amount of customers":Customer}
 df = pd.DataFrame(data) 
 df
-<<<<<<< HEAD
-df.to_csv("SJF_values10.csv")   
-=======
 df.to_csv("SJF_values2.csv")   
->>>>>>> aa704b4bdae55a1960de65cee699ab9e77633c54
