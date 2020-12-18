@@ -16,7 +16,7 @@ def convergence_compare():
     for file_ in files:
         data = pd.read_csv(f'data/values_{file_}_iter.csv') 
         df = pd.DataFrame(data)
-        df =  df.loc[df['Percentage'] == 80] 
+        df = df.loc[df['Percentage'] == 80] 
         frames.append(df)
 
     result = pd.concat(frames)
@@ -71,7 +71,8 @@ def costs_plot():
     for file_ in files:
         name = file_.strip("_301")
         frames = []
-        data = pd.read_csv(f'data/values_{file_}_iter100ml.csv') 
+        
+        data = pd.read_csv(f'/Users/daan/Library/Mobile Documents/com~apple~CloudDocs/Uni/Master Computational Science/Stochastic/data/values_{file_}_iter100ml.csv') 
         df = pd.DataFrame(data)
         df = df.loc[df['Percentage'] == 80] 
         frames.append(df)
@@ -93,8 +94,9 @@ def costs_plot():
             total_300.append(np.mean(all_300))
             cooling_schedule.append(name)
             iterations.append(i+1)
-
-        
+    
+    print(iterations[-1], "einde")
+    exit()
     data = {"Cost in run":total_300, "Iter2":iterations, "Cooling":cooling_schedule}
     df = pd.DataFrame(data) 
     
@@ -103,37 +105,91 @@ def costs_plot():
     ax.set_title(f"Convergence of cost using different cooling schedules")
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Cost")
+    ax.set(xscale="linear", yscale="log")
     figure = ax.get_figure()
     figure.savefig(f'images/Convergence100_{name}.png')
 
 def costs_plot2():
-    files = ["Log_301", "Exponential_301", "Linear_301", "Quadratic_301"]
+    file_ = "Log_301"
     costs1 = [] 
     total_300 = []
     cooling_schedule = []
     iterations = []
+    markov = []
 
+    
+    data = pd.read_csv(f'/Users/daan/Library/Mobile Documents/com~apple~CloudDocs/Uni/Master Computational Science/Stochastic/data/values_{file_}_iter10ml_2.csv') 
+    
+    df = pd.DataFrame(data)
+    # markov_lengths = [10, 25, 50, 75, 100, 125, 150]
+    markov_lengths = [100]
+    for ml in markov_lengths:
+        frames = []
+        ff = df.loc[df['Markov'] == ml] 
+        frames.append(ff)
+
+        result = pd.concat(frames)
+
+        cost_run = result["Cost in run"]
+
+        for costs in cost_run:
+            cost = costs[1:]
+            cost = cost[:-1]
+            cost = cost.split(", ")
+            costs1.append(cost)
+
+        for i in range(len(costs1[0])):
+            all_300 = []
+            for iteration in costs1:
+                all_300.append(float(iteration[i]))
+
+            total_300.append(np.mean(all_300))
+            markov.append(ml)
+            iterations.append(i+1)
+        
+    data = {"Cost in run":total_300, "Iter2":iterations, "Markov":markov}
+    df = pd.DataFrame(data) 
+    
+    ax = sns.lineplot(data=df, x="Iter2", y="Cost in run", hue="Markov")
+    
+    ax.set_title(f"Convergence of log with different ML")
+    ax.set_xlabel("Iteration")
+    ax.set_ylabel("Cost")
+    ax.set(xscale="linear", yscale="log")
+    figure = ax.get_figure()
+    figure.savefig(f'images/Convergence_ML_LOG.png')
+
+def costs_plot3():
+    files = ["Log_301", "Exponential_301", "Linear_301", "Quadratic_301"]
     frames = []
 
     for file_ in files:
         name = file_.strip("_301")
+        
         data = pd.read_csv(f'data/values_{file_}_iter100ml.csv') 
         df = pd.DataFrame(data)
-        df = df.loc[df['Percentage'] == 80] 
+        # df = df.loc[df['Percentage'] == 80] 
         frames.append(df)
 
     result = pd.concat(frames)
-
-    # Checks for convergence 
-    ax = sns.lineplot(data=result, x="Iter2", y="Cost", hue="Cooling_schedule")
+    print("hey kamiel")
+    sns.color_palette("tab10")
+    ax = sns.lineplot(data=result, x="Iter2", y="Cost in run", hue="Cooling_schedule", ci=None)
+    print("nu gaat die lekker")
+    sns.color_palette("tab10")
+    ax.set_title(f"Convergence of cost using different cooling schedules")
+    ax.set_xlabel("Iteration")
+    ax.set_ylabel("Cost")
+    ax.set(xscale="linear", yscale="log")
     figure = ax.get_figure()
-    figure.savefig(f'images/Convergence_301.png')
-    plt.show()
+    figure.savefig(f'images/Convergence_all4.png')
 
 
 if __name__ == "__main__":
     # convergence_compare()
-    costs_plot2()
+    # costs_plot()
+    # costs_plot2()
+    costs_plot3()
 
 
     # oud van costs plot

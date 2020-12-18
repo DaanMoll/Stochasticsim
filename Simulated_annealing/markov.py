@@ -205,7 +205,8 @@ def cooling_schedule(start_temp, max_iterations, iteration, kind):
         # multiplicative
         alpha = 1
         current_temp = start_temp/(1 + alpha * iteration**2)
-    
+
+    # print("doei", kind)
     return current_temp
 
 def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, markov_length):
@@ -215,6 +216,7 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, m
     count = 0
     counter = 0
     iter2 = []
+    cooling2 = []
 
     while iteration < max_iterations:
         iteration += 1
@@ -235,14 +237,15 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, m
                 distance += cost
 
             if counter % 100 == 0:
-                costs.append(distance)
+                costs.append(calculate_cost(best, cost_mat))
                 count += 1
                 iter2.append(count)
+                cooling2.append(cooling)
 
             counter += 1
 
         route = best
-    return best, costs, iter2
+    return best, costs, iter2, cooling2
 
 
 if __name__ == '__main__':
@@ -300,26 +303,18 @@ if __name__ == '__main__':
                     print("i:", i)
                 nn_route = nearest_neighbour(matrix)
                 distance_nn = calculate_cost(nn_route, matrix)
-                init_routes.append(nn_route)
-                init_costs.append(distance_nn)
-
-                backup_nn = copy.deepcopy(nn_route)
-                result = sa_two_opt(backup_nn, cost_mat, distance_nn, cooling, iteration, temp, markov)
+                
+                result = sa_two_opt(nn_route, cost_mat, distance_nn, cooling, iteration, temp, markov)
                 best_route = result[0]
                 cost_over_sim = result[1]
                 iter22 = result[2]
+                cooling2 = result[3]
 
-                cost_during_run.append(cost_over_sim)
-                iter2.append(iter22)
-                cost = calculate_cost(best_route, matrix)
-                
-                routes.append(best_route)
-                costs.append(cost)
-                percentage_v.append(percentage)
-                schedules.append(cooling)
-                markovs.append(markov)
+                cost_during_run.extend(cost_over_sim)
+                iter2.extend(iter22)                
+                schedules.extend(cooling2)
     
-    data = {"Cooling_schedule":schedules, "Markov":markovs, "Init cost":init_costs, "Cost":costs, "Percentage":percentage_v, "Routes":routes, "Init routes":init_routes, "Cost in run":cost_during_run, "Iter2":iter2}
+    data = {"Cooling_schedule":schedules, "Cost in run":cost_during_run, "Iter2":iter2}
     df = pd.DataFrame(data) 
     df
     df.to_csv(f"data/values_{cooling}_{max_i}_iter{markov_length[0]}ml.csv")

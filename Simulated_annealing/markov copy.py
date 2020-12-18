@@ -213,9 +213,8 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, m
     iteration = 0
     costs = []
     count = 0
+    counter = 0
     iter2 = []
-    markov2 = []
-    distance2 = copy.deepcopy(distance)
 
     while iteration < max_iterations:
         iteration += 1
@@ -233,15 +232,17 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, m
 
             if random.uniform(0, 1) < ap:
                 best[i:j] = best[j - 1:i - 1:-1]
-                distance2 += cost
+                distance += cost
 
-        costs.append((calculate_cost(best, cost_mat)))
-        count += 1
-        iter2.append(count)
-        markov2.append(markov_length)
+            if counter % 100 == 0:
+                costs.append(calculate_cost(best, cost_mat))
+                count += 1
+                iter2.append(count)
+
+            counter += 1
 
         route = best
-    return best, costs, iter2, markov2
+    return best, costs, iter2
 
 
 if __name__ == '__main__':
@@ -270,7 +271,8 @@ if __name__ == '__main__':
     percentages = [80]
 
     iteration = 10000
-    markov_length = [10, 25, 50, 75, 100, 125, 150]
+    # markov_length = [10, 25, 50, 75, 100, 125, 150]
+    markov_length = [100]
     
     costs = []
     temperatures_v = []
@@ -286,37 +288,40 @@ if __name__ == '__main__':
     print(cooling)
     temps = temperatures[cooling]
 
-    max_i = 301
-    for i in range(1, max_i):
-        for markov in markov_length:
-            print(cooling, markov)
-            for t in range(len(temps)):
-                temp = temps[t]
-                percentage = percentages[t]
+    for markov in markov_length:
+        print(cooling, markov)
+        for i in range(len(temps)):
+            temp = temps[i]
+            percentage = percentages[i]
 
+            max_i = 301
+            for i in range(1, max_i):
                 if i%50==0:
                     print("i:", i)
                 nn_route = nearest_neighbour(matrix)
                 distance_nn = calculate_cost(nn_route, matrix)
-                result = sa_two_opt(nn_route, cost_mat, distance_nn, cooling, iteration, temp, markov)
+                init_routes.append(nn_route)
+                init_costs.append(distance_nn)
+
+                backup_nn = copy.deepcopy(nn_route)
+                result = sa_two_opt(backup_nn, cost_mat, distance_nn, cooling, iteration, temp, markov)
                 best_route = result[0]
-                
                 cost_over_sim = result[1]
                 iter22 = result[2]
-                markov2 = result[3]
 
                 cost_during_run.append(cost_over_sim)
                 iter2.append(iter22)
-                markovs.append(markov2)
-
-                if i%100==0:
-                    data = {"Markov":markovs, "Cost in run":cost_during_run, "Iter2":iter2}
-                    df = pd.DataFrame(data) 
-                    df.to_csv(f"data/Convergence_{cooling}_{max_i}.csv")
+                cost = calculate_cost(best_route, matrix)
+                
+                routes.append(best_route)
+                costs.append(cost)
+                percentage_v.append(percentage)
+                schedules.append(cooling)
+                markovs.append(markov)
     
-    data = {"Markov":markovs, "Cost in run":cost_during_run, "Iter2":iter2}
+    data = {"Cooling_schedule":schedules, "Markov":markovs, "Init cost":init_costs, "Cost":costs, "Percentage":percentage_v, "Routes":routes, "Init routes":init_routes, "Cost in run":cost_during_run, "Iter2":iter2}
     df = pd.DataFrame(data) 
     df
-    df.to_csv(f"data/Convergence_{cooling}_{max_i}.csv")
+    df.to_csv(f"data/values_{cooling}_{max_i}_iter{markov_length[0]}ml.csv")
 
 
