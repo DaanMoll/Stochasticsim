@@ -205,18 +205,25 @@ def cooling_schedule(start_temp, max_iterations, iteration, kind):
         # multiplicative
         alpha = 1
         current_temp = start_temp/(1 + alpha * iteration**2)
+<<<<<<< HEAD
 
     # print("doei", kind)
+=======
+    
+>>>>>>> 191796ccb0fb5d14823129bccd9d1894538400ea
     return current_temp
 
 def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, markov_length):
     best = route
     iteration = 0
+<<<<<<< HEAD
     costs = []
     count = 0
     counter = 0
     iter2 = []
     cooling2 = []
+=======
+>>>>>>> 191796ccb0fb5d14823129bccd9d1894538400ea
 
     while iteration < max_iterations:
         iteration += 1
@@ -236,6 +243,7 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, m
                 best[i:j] = best[j - 1:i - 1:-1]
                 distance += cost
 
+<<<<<<< HEAD
             if counter % 100 == 0:
                 costs.append(calculate_cost(best, cost_mat))
                 count += 1
@@ -246,6 +254,10 @@ def sa_two_opt(route, cost_mat, distance, cooling, max_iterations, start_temp, m
 
         route = best
     return best, costs, iter2, cooling2
+=======
+        route = best
+    return best
+>>>>>>> 191796ccb0fb5d14823129bccd9d1894538400ea
 
 
 if __name__ == '__main__':

@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+NAME : ./TSPLIB/a280.tsp.optbc.tour
+TYPE : TOUR
+DIMENSION : 280
+TOUR_SECTION
+>>>>>>> 191796ccb0fb5d14823129bccd9d1894538400ea
 1
 2
 242

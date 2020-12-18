@@ -66,3 +66,4 @@ data = {"Servers":simmulation,"Values":c1, "Amount of customers":Customer}
 df = pd.DataFrame(data) 
 df
 df.to_csv("SJF_values2.csv")   
+
